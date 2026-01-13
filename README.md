@@ -5,11 +5,25 @@ Configuration and commands for AI agent tools.
 ## Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/agent-tools.git ~/agent-tools
+git clone https://github.com/N3SSQwiK/agent-tools.git ~/agent-tools
 cd ~/agent-tools
 chmod +x install.sh
 ./install.sh
 ```
+
+The installer uses **managed blocks** - your existing config is preserved:
+
+```markdown
+# Your custom instructions here...
+
+<!-- AGENT-TOOLS:START -->
+(managed content - safe to update)
+<!-- AGENT-TOOLS:END -->
+
+# More of your content...
+```
+
+Re-run `./install.sh` anytime to update managed content without losing your customizations.
 
 ## What's Included
 
