@@ -7,23 +7,22 @@ Configuration and commands for AI agent tools.
 ```bash
 git clone https://github.com/N3SSQwiK/agent-tools.git ~/agent-tools
 cd ~/agent-tools
-chmod +x install.sh
+chmod +x *.sh
+```
+
+**All tools:**
+```bash
 ./install.sh
 ```
 
-The installer uses **managed blocks** - your existing config is preserved:
-
-```markdown
-# Your custom instructions here...
-
-<!-- AGENT-TOOLS:START -->
-(managed content - safe to update)
-<!-- AGENT-TOOLS:END -->
-
-# More of your content...
+**Individual tools:**
+```bash
+./install-claude.sh   # Claude Code only
+./install-gemini.sh   # Gemini CLI only
+./install-codex.sh    # Codex CLI only
 ```
 
-Re-run `./install.sh` anytime to update managed content without losing your customizations.
+The installer uses **managed blocks** - your existing config is preserved.
 
 ## What's Included
 
@@ -31,16 +30,37 @@ Re-run `./install.sh` anytime to update managed content without losing your cust
 
 | File | Purpose |
 |------|---------|
-| `claude/CLAUDE.md` | Global instructions loaded in every project |
-| `claude/commands/continuity.md` | `/continuity` command for session handoff |
+| `claude/CLAUDE.md` | Global instructions (managed block) |
+| `claude/commands/continuity.md` | `/continuity` command |
 
-#### Session Continuity System
+Config location: `~/.claude/`
 
-Tracks work across sessions via `.claude/CONTINUITY.md` in each project.
+### Gemini CLI
+
+| File | Purpose |
+|------|---------|
+| `gemini/GEMINI.md` | Global instructions (managed block) |
+| `gemini/extensions/agent-tools/` | Extension with commands |
+
+Config location: `~/.gemini/`
+
+### Codex CLI
+
+| File | Purpose |
+|------|---------|
+| `codex/prompts/continuity.md` | `/continuity` command |
+
+Config location: `~/.codex/`
+
+Note: Codex uses `AGENTS.md` per-project for global instructions.
+
+## Session Continuity System
+
+Tracks work across sessions via a `CONTINUITY.md` file in each project.
 
 **Workflow:**
-1. Session start → Claude reads project's CONTINUITY.md, asks to proceed or adjust
-2. Milestone reached (PR merged, etc.) → Claude updates CONTINUITY.md
+1. Session start → Agent reads project's CONTINUITY.md, asks to proceed or adjust
+2. Milestone reached (PR merged, etc.) → Agent updates CONTINUITY.md
 3. Manual update → Run `/continuity`
 
 **Format (~60 tokens):**
@@ -57,14 +77,16 @@ Tracks work across sessions via `.claude/CONTINUITY.md` in each project.
 [Tool Name] | [YYYY-MM-DD HH:MM UTC]
 ```
 
+**File locations by tool:**
+| Tool | Continuity file |
+|------|----------------|
+| Claude Code | `.claude/CONTINUITY.md` |
+| Gemini CLI | `.gemini/CONTINUITY.md` |
+| Codex CLI | `.codex/CONTINUITY.md` |
+
 ## Adding New Tools
 
-Create a new directory for each tool:
-
-```
-agent-tools/
-├── claude/          # Claude Code
-├── cursor/          # Cursor (future)
-├── aider/           # Aider (future)
-└── install.sh       # Update to handle new tools
-```
+1. Create a new directory: `<tool>/`
+2. Add config files
+3. Create `install-<tool>.sh`
+4. Update `install.sh` to include it

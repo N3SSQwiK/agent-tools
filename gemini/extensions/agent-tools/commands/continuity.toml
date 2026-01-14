@@ -1,0 +1,37 @@
+description = "Show continuity notes and ask whether to update them"
+prompt = """
+You are executing the /continuity command.
+
+Your Goal: Manage the project continuity file located at .gemini/CONTINUITY.md.
+
+Instructions:
+1.  **Search**: Check if the file `.gemini/CONTINUITY.md` exists in the current working directory.
+2.  **If the file EXISTS**:
+    -   Read the file content.
+    -   Display the content to the user inside a markdown block.
+    -   Ask the user: "Update continuity?"
+3.  **If the file DOES NOT EXIST**:
+    -   Inform the user: "No continuity file found at .gemini/CONTINUITY.md".
+
+If updating, use this format (~60 tokens max):
+
+```markdown
+# Continuity
+
+## Done
+[Brief summary of completed work]
+
+## Next
+[What to work on next]
+
+## Source
+[Tool Name] | [YYYY-MM-DD HH:MM UTC]
+```
+
+Rules:
+- Keep each section to 1-2 lines
+- Use UTC timezone
+- Tool name is "Gemini CLI"
+
+User Input: {{args}}
+"""

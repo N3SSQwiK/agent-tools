@@ -1,0 +1,6 @@
+{
+  "name": "agent-tools",
+  "version": "1.0.0",
+  "description": "Session continuity and workflow commands",
+  "contextFileName": "GEMINI.md"
+}
