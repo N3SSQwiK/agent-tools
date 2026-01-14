@@ -48,11 +48,10 @@ Config location: `~/.gemini/`
 
 | File | Purpose |
 |------|---------|
+| `codex/AGENTS.md` | Global instructions (managed block) |
 | `codex/prompts/continuity.md` | `/continuity` command |
 
 Config location: `~/.codex/`
-
-Note: Codex uses `AGENTS.md` per-project for global instructions.
 
 ## Session Continuity System
 
