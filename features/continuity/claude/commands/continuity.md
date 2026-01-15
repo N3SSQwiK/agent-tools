@@ -52,6 +52,20 @@ Update the project's session continuity file.
 - Use UTC timezone (run `date -u "+%Y-%m-%d %H:%M UTC"`)
 - Tool name is "Claude Code"
 
+## Update Rules (CRITICAL)
+
+When updating an existing file, you MUST:
+
+1. **Prune "In Progress"** - Move completed items to "Completed", remove finished work entirely from this section. Only list work that is genuinely incomplete.
+
+2. **Prune "Completed"** - Keep only the 5-7 most recent/relevant items. Remove old items that are no longer useful context for the next session.
+
+3. **Refresh "Suggested Prompt"** - This MUST reflect the ACTUAL next steps. Never leave stale instructions. Ask yourself: "If I started a fresh session and copy-pasted this prompt, would it make sense?"
+
+4. **Update "Context"** - Remove outdated statements. If something was true last session but isn't now (e.g., "uncommitted changes" after committing), remove it.
+
+5. **Update "Key Files"** - Reflect currently relevant files, not historical ones.
+
 ## Migration
 
 If `.ai/CONTINUITY.md` does not exist but `.claude/CONTINUITY.md` does:

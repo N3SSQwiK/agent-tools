@@ -55,5 +55,12 @@ Rules:
 - Use UTC timezone
 - Tool name is "Gemini CLI"
 
+Update Rules (CRITICAL) - When updating an existing file, you MUST:
+1. **Prune "In Progress"** - Move completed items to "Completed", remove finished work entirely. Only list genuinely incomplete work.
+2. **Prune "Completed"** - Keep only 5-7 most recent/relevant items. Remove old items no longer useful.
+3. **Refresh "Suggested Prompt"** - MUST reflect ACTUAL next steps. Never leave stale instructions. Ask: "If I copy-pasted this in a fresh session, would it make sense?"
+4. **Update "Context"** - Remove outdated statements (e.g., "uncommitted changes" after committing).
+5. **Update "Key Files"** - Reflect currently relevant files, not historical ones.
+
 User Input: {{args}}
 """
