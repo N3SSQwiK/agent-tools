@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# NEXUS Agent Tools Installer
-# Interactive TUI for installing agent tools configuration
+# Nexus-AI Installer
+# Interactive TUI for installing AI assistant configuration
 
 set -e
 
@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo ""
 echo "  ╭──────────────────────────────────────────╮"
-echo "  │         NEXUS Agent Tools                │"
+echo "  │              Nexus-AI                    │"
 echo "  ╰──────────────────────────────────────────╯"
 echo ""
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS Installer - Python + Textual Version
+Nexus-AI Installer - Python + Textual Version
 Fraternal colors: Red, White, Navy Blue, Gold
 """
 
@@ -274,7 +274,7 @@ class WelcomeScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Container(
             Banner(id="banner"),
-            Static("Agent Tools Installer", id="subtitle"),
+            Static("AI Assistant Configuration", id="subtitle"),
             Static("Press enter to continue • q to quit", id="help"),
             id="welcome-container"
         )

@@ -17,18 +17,18 @@ pip install -r requirements.txt
 ## Run
 
 ```bash
-python installer.py
+python nexus.py
 ```
 
 Or from the repo root:
 
 ```bash
-python installer/python/installer.py
+python installer/python/nexus.py
 ```
 
 ## Features
 
-- Animated NEXUS banner with gradient colors
+- Animated Nexus-AI banner with gradient colors
 - Interactive tool and feature selection
 - CSS-based styling (nexus.tcss)
 - Adaptive light/dark mode
@@ -49,9 +49,10 @@ Edit `nexus.tcss` to customize the appearance. Textual uses CSS-like syntax:
 
 ## Design System
 
-Colors are defined in `installer.py`:
+Fraternal colors defined in `nexus.py`:
 
-- **Gradient palette**: cyan → teal → blue → indigo → violet → rose
-- **Wave colors**: cyan → teal → blue → violet → rose → peach
-- **Accent**: amber (sparkles)
-- **Success**: emerald green
+- **Red**: #C41E3A
+- **White**: #FFFFFF
+- **Navy**: #1E3A8A
+- **Gold**: #E8C547 (accent, sparkles)
+- **Success**: #34d399 (emerald)
