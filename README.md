@@ -62,33 +62,45 @@ agent-tools/
 
 ### Continuity
 
-Session continuity tracking across projects.
+Session continuity tracking across projects with seamless tool switching.
 
 **How it works:**
-1. **Session start** → Agent reads project's CONTINUITY.md, asks to proceed or adjust
-2. **Milestone reached** → Agent updates CONTINUITY.md
-3. **Manual update** → Run `/continuity`
+1. **Run `/continuity`** → Agent reads `.ai/CONTINUITY.md`, presents summary and suggested prompt
+2. **Update** → Confirm to update with current session state
+3. **Next session** → Run `/continuity` again to resume context
 
-**Format (~60 tokens):**
+**Unified location:** All tools read/write to `.ai/CONTINUITY.md` in your project root. This enables switching between Claude, Gemini, and Codex without losing context.
+
+**Format (~500 tokens):**
 ```markdown
 # Continuity
 
-## Done
-[Brief summary of completed work]
+## Summary
+[Project context - what is being built and why]
 
-## Next
-[What to work on next]
+## Completed
+- [Recent finished work items, 5-7 max]
+
+## In Progress
+- [Active work not yet complete]
+
+## Blocked
+[Impediments or "None"]
+
+## Key Files
+- `path/to/file` - [description]
+
+## Context
+[Session state, preferences, constraints]
+
+## Suggested Prompt
+> [Actionable prompt to continue work in next session]
 
 ## Source
 [Tool Name] | [YYYY-MM-DD HH:MM UTC]
 ```
 
-**File locations:**
-| Tool | Continuity file |
-|------|-----------------|
-| Claude Code | `.claude/CONTINUITY.md` |
-| Gemini CLI | `.gemini/CONTINUITY.md` |
-| Codex CLI | `.codex/CONTINUITY.md` |
+**Migration:** Tools automatically detect legacy files (`.claude/CONTINUITY.md`, `.gemini/CONTINUITY.md`, `.codex/CONTINUITY.md`) and offer to migrate them to the unified location.
 
 ## Adding Features
 
