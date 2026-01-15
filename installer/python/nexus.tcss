@@ -1,0 +1,224 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NEXUS INSTALLER - CSS THEME
+   Glass morphism inspired design with cyan-to-rose gradient
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Base screen */
+Screen {
+    background: $surface;
+    overflow: hidden;
+}
+
+/* Banner container */
+#banner-container {
+    width: 100%;
+    height: auto;
+    content-align: center middle;
+    padding: 1 0;
+}
+
+#banner {
+    width: auto;
+    height: auto;
+    content-align: center middle;
+}
+
+#sparkles {
+    width: 100%;
+    height: 1;
+    content-align: center middle;
+    color: $warning;
+    text-style: bold;
+}
+
+#wave-lines {
+    width: 100%;
+    height: 3;
+    content-align: center middle;
+}
+
+/* Main content panels */
+.glass-panel {
+    background: $panel;
+    border: round $primary-lighten-2;
+    padding: 1 2;
+    margin: 1 4;
+    width: 64;
+    height: auto;
+}
+
+.glass-panel:focus-within {
+    border: round $secondary;
+}
+
+/* Title styling */
+.panel-title {
+    text-style: bold;
+    color: $text;
+    margin-bottom: 1;
+}
+
+.panel-subtitle {
+    color: $text-muted;
+    text-style: italic;
+    margin-bottom: 1;
+}
+
+/* Selection list */
+SelectionList {
+    background: transparent;
+    padding: 0;
+    height: auto;
+}
+
+SelectionList > .selection-list--option {
+    padding: 0 1;
+    background: transparent;
+}
+
+SelectionList > .selection-list--option-highlighted {
+    background: $boost;
+}
+
+SelectionList:focus > .selection-list--option-highlighted {
+    background: $primary-darken-2;
+}
+
+/* Checkbox styling */
+.option-checkbox {
+    width: 3;
+    color: $text-muted;
+}
+
+.option-checkbox.checked {
+    color: $secondary;
+    text-style: bold;
+}
+
+.option-label {
+    color: $text;
+}
+
+.option-label.highlighted {
+    color: $secondary;
+    text-style: bold;
+}
+
+.option-description {
+    color: $text-muted;
+    padding-left: 4;
+    margin-bottom: 1;
+}
+
+/* Progress indicators */
+#progress-container {
+    width: 100%;
+    padding: 1 2;
+}
+
+.progress-item {
+    height: 1;
+    padding: 0 1;
+}
+
+.progress-icon {
+    width: 3;
+}
+
+.progress-icon.done {
+    color: $success;
+    text-style: bold;
+}
+
+.progress-icon.active {
+    color: $secondary;
+}
+
+.progress-icon.pending {
+    color: $text-muted;
+}
+
+.progress-label {
+    color: $text;
+}
+
+.progress-label.done {
+    color: $success;
+}
+
+.progress-label.pending {
+    color: $text-muted;
+}
+
+/* Footer help text */
+#help-text {
+    dock: bottom;
+    width: 100%;
+    height: 1;
+    content-align: center middle;
+    color: $text-muted;
+    background: $surface;
+    padding: 0 2;
+}
+
+/* Success screen */
+#success-container {
+    width: 100%;
+    height: auto;
+    content-align: center middle;
+    padding: 2;
+}
+
+.success-title {
+    text-style: bold;
+    color: $success;
+    text-align: center;
+}
+
+.success-summary {
+    color: $text-muted;
+    text-align: center;
+    margin-top: 1;
+}
+
+.success-value {
+    color: $secondary;
+}
+
+/* Button styling */
+Button {
+    background: $primary;
+    color: $text;
+    border: none;
+    padding: 0 2;
+    margin: 1 0;
+}
+
+Button:hover {
+    background: $primary-lighten-1;
+}
+
+Button:focus {
+    background: $secondary;
+    text-style: bold;
+}
+
+/* Welcome screen */
+#welcome-text {
+    width: 100%;
+    height: auto;
+    content-align: center middle;
+    padding: 1;
+}
+
+.welcome-subtitle {
+    color: $text-muted;
+    text-style: italic;
+    text-align: center;
+}
+
+.welcome-hint {
+    color: $text-muted;
+    text-align: center;
+    margin-top: 2;
+}

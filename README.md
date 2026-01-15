@@ -1,6 +1,15 @@
-# agent-tools
+# NEXUS Agent Tools
 
-Configuration and commands for AI agent tools.
+```
+███╗   ██╗███████╗██╗  ██╗██╗   ██╗███████╗
+████╗  ██║██╔════╝╚██╗██╔╝██║   ██║██╔════╝
+██╔██╗ ██║█████╗   ╚███╔╝ ██║   ██║███████╗
+██║╚██╗██║██╔══╝   ██╔██╗ ██║   ██║╚════██║
+██║ ╚████║███████╗██╔╝ ██╗╚██████╔╝███████║
+╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+```
+
+Configuration and commands for AI coding assistants.
 
 ## Install
 
@@ -8,59 +17,57 @@ Configuration and commands for AI agent tools.
 git clone https://github.com/N3SSQwiK/agent-tools.git ~/agent-tools
 cd ~/agent-tools
 chmod +x *.sh
-```
-
-**All tools:**
-```bash
 ./install.sh
 ```
 
-**Individual tools:**
+The installer provides an interactive TUI for selecting tools and features.
+
+**Requirements:** Python 3.9+ (recommended) or Go 1.21+
+
+**Legacy installers (bash only):**
 ```bash
 ./install-claude.sh   # Claude Code only
 ./install-gemini.sh   # Gemini CLI only
 ./install-codex.sh    # Codex CLI only
 ```
 
-The installer uses **managed blocks** - your existing config is preserved.
+## Repo Structure
 
-## What's Included
+```
+agent-tools/
+├── features/                    # Feature modules
+│   └── continuity/              # Session continuity feature
+│       ├── claude/              # Claude Code files
+│       ├── gemini/              # Gemini CLI files
+│       └── codex/               # Codex CLI files
+├── installer/                   # Interactive TUI installers
+│   ├── go/                      # Go + Bubbletea version
+│   └── python/                  # Python + Textual version
+├── docs/                        # Documentation
+│   ├── CLAUDE-COMMANDS.md
+│   ├── GEMINI-EXTENSIONS.md
+│   └── CODEX-COMMANDS.md
+└── install*.sh                  # Install scripts
+```
 
-### Claude Code
+## Supported Tools
 
-| File | Purpose |
-|------|---------|
-| `claude/CLAUDE.md` | Global instructions (managed block) |
-| `claude/commands/continuity.md` | `/continuity` command |
+| Tool | Config Location | Commands |
+|------|-----------------|----------|
+| Claude Code | `~/.claude/` | `/continuity` |
+| Gemini CLI | `~/.gemini/` | `/continuity` |
+| Codex CLI | `~/.codex/` | `/prompts:continuity` |
 
-Config location: `~/.claude/`
+## Features
 
-### Gemini CLI
+### Continuity
 
-| File | Purpose |
-|------|---------|
-| `gemini/GEMINI.md` | Global instructions (managed block) |
-| `gemini/extensions/agent-tools/` | Extension with commands |
+Session continuity tracking across projects.
 
-Config location: `~/.gemini/`
-
-### Codex CLI
-
-| File | Purpose |
-|------|---------|
-| `codex/AGENTS.md` | Global instructions (managed block) |
-| `codex/prompts/continuity.md` | `/continuity` command |
-
-Config location: `~/.codex/`
-
-## Session Continuity System
-
-Tracks work across sessions via a `CONTINUITY.md` file in each project.
-
-**Workflow:**
-1. Session start → Agent reads project's CONTINUITY.md, asks to proceed or adjust
-2. Milestone reached (PR merged, etc.) → Agent updates CONTINUITY.md
-3. Manual update → Run `/continuity`
+**How it works:**
+1. **Session start** → Agent reads project's CONTINUITY.md, asks to proceed or adjust
+2. **Milestone reached** → Agent updates CONTINUITY.md
+3. **Manual update** → Run `/continuity`
 
 **Format (~60 tokens):**
 ```markdown
@@ -76,16 +83,54 @@ Tracks work across sessions via a `CONTINUITY.md` file in each project.
 [Tool Name] | [YYYY-MM-DD HH:MM UTC]
 ```
 
-**File locations by tool:**
+**File locations:**
 | Tool | Continuity file |
-|------|----------------|
+|------|-----------------|
 | Claude Code | `.claude/CONTINUITY.md` |
 | Gemini CLI | `.gemini/CONTINUITY.md` |
 | Codex CLI | `.codex/CONTINUITY.md` |
 
-## Adding New Tools
+## Adding Features
 
-1. Create a new directory: `<tool>/`
-2. Add config files
-3. Create `install-<tool>.sh`
-4. Update `install.sh` to include it
+1. Create directory: `features/<feature-name>/`
+2. Add tool-specific subdirectories with config files
+3. Run `./install.sh` to install
+
+### Structure for a new feature:
+
+```
+features/<feature-name>/
+├── claude/
+│   ├── CLAUDE.md              # Global instructions (optional)
+│   └── commands/
+│       └── <feature-name>.md  # Slash command
+├── gemini/
+│   ├── GEMINI.md              # Global instructions (optional)
+│   └── extensions/
+│       └── <feature-name>/
+│           ├── gemini-extension.json
+│           └── commands/
+│               └── <feature-name>.toml
+└── codex/
+    ├── AGENTS.md              # Global instructions (optional)
+    └── prompts/
+        └── <feature-name>.md  # Slash command
+```
+
+## Managed Blocks
+
+Config files use managed blocks to preserve your existing configuration:
+
+```markdown
+<!-- AGENT-TOOLS:START -->
+[Installer-managed content]
+<!-- AGENT-TOOLS:END -->
+```
+
+Your content outside these markers is preserved during updates.
+
+## Documentation
+
+- [Claude Code Commands](docs/CLAUDE-COMMANDS.md)
+- [Gemini CLI Extensions](docs/GEMINI-EXTENSIONS.md)
+- [Codex CLI Custom Prompts](docs/CODEX-COMMANDS.md)
