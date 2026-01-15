@@ -15,17 +15,27 @@ echo ""
 
 # Check for Python (preferred - no build required)
 if command -v python3 &> /dev/null; then
-    echo "  Starting Python installer..."
-    echo ""
+    VENV_DIR="$SCRIPT_DIR/installer/python/venv"
+    VENV_PYTHON="$VENV_DIR/bin/python"
 
-    # Install dependencies if needed
-    if ! python3 -c "import textual" 2>/dev/null; then
-        echo "  Installing dependencies..."
-        pip3 install -q -r "$SCRIPT_DIR/installer/python/requirements.txt"
+    # Use venv if it exists with deps installed, otherwise set it up
+    if [ -f "$VENV_PYTHON" ] && "$VENV_PYTHON" -c "import textual" 2>/dev/null; then
+        cd "$SCRIPT_DIR"
+        "$VENV_PYTHON" installer/python/nexus.py
+        exit 0
     fi
 
+    # Create venv if needed
+    if [ ! -f "$VENV_PYTHON" ]; then
+        echo "  Creating virtual environment..."
+        python3 -m venv "$VENV_DIR" || { echo "  Failed to create venv"; exit 1; }
+    fi
+
+    echo "  Installing dependencies..."
+    "$VENV_PYTHON" -m pip install -q -r "$SCRIPT_DIR/installer/python/requirements.txt"
+
     cd "$SCRIPT_DIR"
-    python3 installer/python/installer.py
+    "$VENV_PYTHON" installer/python/nexus.py
     exit 0
 fi
 
