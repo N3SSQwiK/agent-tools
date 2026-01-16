@@ -6,5 +6,5 @@ __pycache__/
 # macOS
 .DS_Store
 
-# Codex continuity
+# AI continuity (local state)
 .ai/
