@@ -1,0 +1,79 @@
+---
+description: Decompose a goal into atomic tasks for multi-agent orchestration
+argument-hint: <goal>
+---
+
+## Goal
+
+Decompose a high-level goal into atomic tasks for multi-agent orchestration.
+
+## Behavior
+
+1. Parse the goal from user input
+
+2. Understand codebase context:
+   - Find existing patterns relevant to the goal
+   - Identify key files and dependencies
+   - Understand current architecture
+
+3. Decompose goal into atomic tasks:
+   - Each task has single responsibility
+   - Clear success criteria
+   - Dependencies between tasks identified
+
+4. Assign specialist and tool to each task:
+   - **Specialists:** `code`, `review`, `test`, `research`
+   - **Tools:** `Claude Code`, `Gemini CLI`, `Codex CLI`
+   - User can modify assignments before approval
+
+5. Present plan to user for approval:
+   - Show goal, tasks, assignments
+   - Ask: "Approve plan? (yes/no/modify)"
+
+6. If approved, write to `.ai/MAESTRO.md`
+
+7. If logging enabled (`--log=summary` or `--log=detailed`), initialize `.ai/MAESTRO-LOG.md`
+
+## Precondition Checks (AAVSR)
+
+Validate each task against:
+- **Atomic:** Single responsibility, one clear outcome?
+- **Authority:** Assigned specialist can complete this?
+- **Verifiable:** Success criteria are testable?
+- **Scope:** Task fits within boundaries?
+- **Risk:** Acceptable failure impact?
+
+If any check fails, decompose further or adjust assignment.
+
+## State File Format
+
+After approval, write to `.ai/MAESTRO.md`:
+
+```markdown
+# Maestro Orchestration
+
+## Goal
+[High-level objective]
+
+## Tasks
+| ID | Description | Status | Specialist | Tool | Depends |
+|----|-------------|--------|------------|------|---------|
+| 1 | [description] | pending | code | Gemini CLI | - |
+| 2 | [description] | pending | test | Codex CLI | 1 |
+
+## Source
+Codex CLI | [YYYY-MM-DD HH:MM UTC]
+```
+
+## Rules
+
+- Tasks must be atomic - if unsure, decompose further
+- Each task needs at least one testable success criterion
+- Never auto-approve - always get user confirmation
+- Use UTC timezone for timestamps
+- Hub tool name is "Codex CLI"
+
+## Flags
+
+- `--log=summary`: Log actions and outcomes to `.ai/MAESTRO-LOG.md`
+- `--log=detailed`: Log full prompts and outputs

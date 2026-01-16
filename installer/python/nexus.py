@@ -167,6 +167,7 @@ TOOLS = [
 
 FEATURES = [
     Feature("continuity", "continuity", "Session continuity tracking across projects", True),
+    Feature("maestro", "maestro", "Multi-agent orchestration with hub-spoke model", False),
 ]
 
 
