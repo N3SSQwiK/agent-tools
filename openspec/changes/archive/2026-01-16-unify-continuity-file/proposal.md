@@ -1,18 +1,16 @@
 # Proposal: Unify Continuity File
 
-## Problem Statement
+## Why
 
-The current continuity feature creates separate files per AI tool:
-- `.claude/CONTINUITY.md`
-- `.gemini/CONTINUITY.md`
-- `.codex/CONTINUITY.md`
+The current continuity feature creates separate files per AI tool (`.claude/CONTINUITY.md`, `.gemini/CONTINUITY.md`, `.codex/CONTINUITY.md`), causing context loss when switching between tools. A user working with Claude for several sessions loses all context when switching to Gemini. Additional issues include duplication, drift between files, and manual maintenance burden.
 
-This causes **context loss when switching between tools**. If a user works with Claude for several sessions, then switches to Gemini, Gemini has no knowledge of what was accomplished—defeating the purpose of session continuity.
+## What Changes
 
-Additional issues:
-- **Duplication**: Same project state documented 3 times
-- **Drift**: Files become inconsistent as tools are used unevenly
-- **Maintenance burden**: Keeping files in sync is manual
+- Unify to a single shared continuity file at `.ai/CONTINUITY.md`
+- Expand format from ~60 to ~500 tokens with richer context
+- Add new sections: Summary, Completed, In Progress, Blocked, Key Files, Context, Suggested Prompt, Source
+- Add migration logic for existing per-tool legacy files
+- Add legacy file detection with `.ai/.legacy-checked` flag
 
 ## Proposed Solution
 

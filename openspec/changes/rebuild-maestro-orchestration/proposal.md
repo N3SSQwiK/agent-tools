@@ -1,15 +1,18 @@
 # Proposal: Rebuild Maestro Multi-Agent Orchestration
 
-## Problem Statement
+## Why
 
-Maestro v1 was a multi-agent orchestration system where Claude Code acted as the orchestrator, delegating work to Gemini CLI and Codex CLI to reduce token usage and maximize parallel work.
+Maestro v1 had critical limitations: Claude-only orchestrator (hardcoded assumption), no slash commands (inconsistent protocol usage), protocol drift (agent defaulted to internal logic), hardcoded paths, and manual state management. These issues prevented reliable multi-agent orchestration.
 
-**V1 Issues:**
-1. **Claude-only orchestrator** - Hardcoded assumption limits flexibility
-2. **No slash commands** - Protocol was documentation-based, leading to inconsistent usage
-3. **Protocol drift** - Agent frequently defaulted to internal logic instead of following the orchestration protocol
-4. **Hardcoded paths** - Tied to specific project directories
-5. **Manual state management** - No automated tracking of orchestration state
+## What Changes
+
+- Rebuild as tool-agnostic Hub-and-Spoke system (any tool can orchestrate)
+- Add 6 slash commands: `/maestro plan`, `/maestro challenge`, `/maestro run`, `/maestro review`, `/maestro status`, `/maestro report`
+- Implement structured I/O schemas for protocol enforcement
+- Central state file `.ai/MAESTRO.md` with execution logging to `.ai/MAESTRO-LOG.md`
+- Predefined specialists (code, review, test, research) with atomic task design
+- Token budget enforcement, cost tracking, and opt-in execution logging
+- Archive v1 docs to `docs/maestro-v1/`, create v2 docs in `features/maestro/docs/`
 
 ## Proposed Solution
 

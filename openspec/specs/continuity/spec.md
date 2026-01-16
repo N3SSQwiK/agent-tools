@@ -1,7 +1,8 @@
-# Continuity Feature Spec Delta
+# continuity Specification
 
-## MODIFIED Requirements
-
+## Purpose
+TBD - created by archiving change unify-continuity-file. Update Purpose after archive.
+## Requirements
 ### Requirement: Unified Continuity File Location
 All AI tools (Claude Code, Gemini CLI, Codex CLI) MUST read and write session continuity state to a single shared file at `.ai/CONTINUITY.md` in the project root.
 
@@ -90,3 +91,4 @@ The continuity file MUST include an actionable Suggested Prompt that enables sea
 - **When** the tool writes the continuity file
 - **Then** the Suggested Prompt explicitly mentions pending decisions
 - **And** provides options or context needed to make the decision
+
