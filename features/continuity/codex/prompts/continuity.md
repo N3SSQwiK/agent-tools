@@ -3,18 +3,38 @@ description: Show continuity notes and ask whether to update them
 argument-hint:
 ---
 
-Check if `.ai/CONTINUITY.md` exists in the current working directory.
+## Behavior
 
-**If unified file exists:**
-- Read and display its contents verbatim
-- Ask the user: "Update continuity?"
+1. Check for `.ai/.legacy-checked` flag file
+   - If exists, skip legacy scan and proceed to step 4
+   - If not exists, proceed to step 2
 
-**If unified file does not exist:**
-- Check for legacy file at `.codex/CONTINUITY.md`
-- If legacy exists, display content and ask: "Found legacy continuity file. Migrate to unified location (.ai/CONTINUITY.md)?"
-- If no files exist, say: "No continuity file found."
+2. Scan ALL legacy paths: `.claude/CONTINUITY.md`, `.gemini/CONTINUITY.md`, `.codex/CONTINUITY.md`
 
-If updating or creating, use this expanded format (~500 tokens):
+3. Handle legacy files based on whether `.ai/CONTINUITY.md` exists (see Legacy Check Logic below)
+
+4. If `.ai/CONTINUITY.md` exists, display contents
+
+5. Ask user: "Update continuity?"
+
+6. If yes, write new summary using the format below
+
+## Legacy Check Logic
+
+### Case A: .ai/CONTINUITY.md EXISTS + legacy files found
+Display warning listing all legacy files with their Source timestamps. Suggest user delete stale files after verifying `.ai/CONTINUITY.md` has latest context. After user acknowledges, create `.ai/.legacy-checked` with current UTC timestamp.
+
+### Case B: .ai/CONTINUITY.md DOES NOT EXIST + ONE legacy file found
+Offer to migrate: "Found legacy continuity file at [path]. Migrate to unified location (.ai/CONTINUITY.md)?"
+If yes, migrate content (convert to new format if possible), then create `.ai/.legacy-checked`.
+
+### Case C: .ai/CONTINUITY.md DOES NOT EXIST + MULTIPLE legacy files found
+List all legacy files with their Source timestamps. Let user choose which to migrate to `.ai/CONTINUITY.md`. After migration, create `.ai/.legacy-checked`.
+
+### Case D: No legacy files found
+Proceed normally. Create `.ai/.legacy-checked` when first writing `.ai/CONTINUITY.md`.
+
+## Format (~500 tokens)
 
 ```markdown
 # Continuity
@@ -46,7 +66,7 @@ If updating or creating, use this expanded format (~500 tokens):
 [Tool Name] | [YYYY-MM-DD HH:MM UTC]
 ```
 
-Rules:
+## Rules
 - Total content should be approximately 500 tokens
 - Prioritize the Suggested Prompt section (~120 tokens) - this is the key handoff mechanism
 - Keep Summary concise (1-2 sentences)

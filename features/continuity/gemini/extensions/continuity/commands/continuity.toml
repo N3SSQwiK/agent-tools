@@ -4,18 +4,38 @@ You are executing the /continuity command.
 
 Your Goal: Manage the project continuity file located at .ai/CONTINUITY.md.
 
-Instructions:
-1.  **Check unified location**: Check if `.ai/CONTINUITY.md` exists in the current working directory.
-2.  **If unified file EXISTS**:
-    -   Read the file content.
-    -   Display the content to the user inside a markdown block.
-    -   Ask the user: "Update continuity?"
-3.  **If unified file DOES NOT EXIST**:
-    -   Check for legacy file at `.gemini/CONTINUITY.md`
-    -   If legacy exists, display content and ask: "Found legacy continuity file. Migrate to unified location (.ai/CONTINUITY.md)?"
-    -   If no files exist, inform user: "No continuity file found."
+## Behavior
 
-If updating or creating, use this expanded format (~500 tokens):
+1. Check for `.ai/.legacy-checked` flag file
+   - If exists, skip legacy scan and proceed to step 4
+   - If not exists, proceed to step 2
+
+2. Scan ALL legacy paths: `.claude/CONTINUITY.md`, `.gemini/CONTINUITY.md`, `.codex/CONTINUITY.md`
+
+3. Handle legacy files based on whether `.ai/CONTINUITY.md` exists (see Legacy Check Logic below)
+
+4. If `.ai/CONTINUITY.md` exists, display contents
+
+5. Ask user: "Update continuity?"
+
+6. If yes, write new summary using the format below
+
+## Legacy Check Logic
+
+### Case A: .ai/CONTINUITY.md EXISTS + legacy files found
+Display warning listing all legacy files with their Source timestamps. Ask user to acknowledge, then create `.ai/.legacy-checked` with current UTC timestamp.
+
+### Case B: .ai/CONTINUITY.md DOES NOT EXIST + ONE legacy file found
+Offer to migrate: "Found legacy continuity file at [path]. Migrate to unified location?"
+If yes, migrate content, then create `.ai/.legacy-checked`.
+
+### Case C: .ai/CONTINUITY.md DOES NOT EXIST + MULTIPLE legacy files found
+List all legacy files with Source timestamps. Let user choose which to migrate, then create `.ai/.legacy-checked`.
+
+### Case D: No legacy files found
+Proceed normally. Create `.ai/.legacy-checked` when first writing `.ai/CONTINUITY.md`.
+
+## Format (~500 tokens)
 
 ```markdown
 # Continuity
@@ -47,7 +67,7 @@ If updating or creating, use this expanded format (~500 tokens):
 [Tool Name] | [YYYY-MM-DD HH:MM UTC]
 ```
 
-Rules:
+## Rules
 - Total content should be approximately 500 tokens
 - Prioritize the Suggested Prompt section (~120 tokens) - this is the key handoff mechanism
 - Keep Summary concise (1-2 sentences)
@@ -55,7 +75,8 @@ Rules:
 - Use UTC timezone
 - Tool name is "Gemini CLI"
 
-Update Rules (CRITICAL) - When updating an existing file, you MUST:
+## Update Rules (CRITICAL)
+When updating an existing file, you MUST:
 1. **Prune "In Progress"** - Move completed items to "Completed", remove finished work entirely. Only list genuinely incomplete work.
 2. **Prune "Completed"** - Keep only 5-7 most recent/relevant items. Remove old items no longer useful.
 3. **Refresh "Suggested Prompt"** - MUST reflect ACTUAL next steps. Never leave stale instructions. Ask: "If I copy-pasted this in a fresh session, would it make sense?"

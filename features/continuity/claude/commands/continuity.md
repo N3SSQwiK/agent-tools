@@ -4,10 +4,56 @@ Update the project's session continuity file.
 
 ## Behavior
 
-1. Check for `.ai/CONTINUITY.md` - if exists, display contents
-2. If not found, check legacy paths (`.claude/CONTINUITY.md`) and offer migration
-3. Ask user: "Update continuity?"
-4. If yes, write new summary using the expanded format below
+1. Check for `.ai/.legacy-checked` flag file
+   - If exists, skip legacy scan and proceed to step 4
+   - If not exists, proceed to step 2
+
+2. Scan ALL legacy paths: `.claude/CONTINUITY.md`, `.gemini/CONTINUITY.md`, `.codex/CONTINUITY.md`
+
+3. Handle legacy files based on whether `.ai/CONTINUITY.md` exists:
+   - See "Legacy Check Logic" section below
+
+4. If `.ai/CONTINUITY.md` exists, display contents
+
+5. Ask user: "Update continuity?"
+
+6. If yes, write new summary using the expanded format below
+
+## Legacy Check Logic
+
+### Case A: `.ai/CONTINUITY.md` EXISTS + legacy files found
+Display warning:
+```
+⚠️ Found legacy continuity files:
+- .claude/CONTINUITY.md (Source line from file)
+- .gemini/CONTINUITY.md (Source line from file)
+[list all that exist]
+
+These may be stale. Consider deleting them after verifying
+.ai/CONTINUITY.md has the latest context.
+```
+After user acknowledges, create `.ai/.legacy-checked` with current UTC timestamp.
+
+### Case B: `.ai/CONTINUITY.md` DOES NOT EXIST + ONE legacy file found
+```
+Found legacy continuity file at [path].
+Migrate to unified location (.ai/CONTINUITY.md)?
+```
+If yes, migrate content (convert to new format if possible), then create `.ai/.legacy-checked`.
+
+### Case C: `.ai/CONTINUITY.md` DOES NOT EXIST + MULTIPLE legacy files found
+```
+Found multiple legacy continuity files:
+- .claude/CONTINUITY.md (Source line from file)
+- .gemini/CONTINUITY.md (Source line from file)
+[list all that exist with their Source timestamps]
+
+Which would you like to migrate to .ai/CONTINUITY.md?
+```
+Let user choose, migrate selected file, then create `.ai/.legacy-checked`.
+
+### Case D: No legacy files found
+Proceed normally. Create `.ai/.legacy-checked` when first writing `.ai/CONTINUITY.md`.
 
 ## Format (~500 tokens)
 
@@ -65,11 +111,3 @@ When updating an existing file, you MUST:
 4. **Update "Context"** - Remove outdated statements. If something was true last session but isn't now (e.g., "uncommitted changes" after committing), remove it.
 
 5. **Update "Key Files"** - Reflect currently relevant files, not historical ones.
-
-## Migration
-
-If `.ai/CONTINUITY.md` does not exist but `.claude/CONTINUITY.md` does:
-1. Display the legacy content
-2. Ask: "Found legacy continuity file. Migrate to unified location (.ai/CONTINUITY.md)?"
-3. If yes, create `.ai/CONTINUITY.md` with the content (convert to new format if possible)
-4. Suggest user delete the legacy file after verifying migration
