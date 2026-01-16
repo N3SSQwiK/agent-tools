@@ -3,25 +3,111 @@
 Update the project's session continuity file.
 
 ## Behavior
-1. Read `.claude/CONTINUITY.md` if it exists and display contents
-2. Ask user: "Update continuity?"
-3. If yes, write new summary using the format below
 
-## Format (~60 tokens max)
+1. Check for `.ai/.legacy-checked` flag file
+   - If exists, skip legacy scan and proceed to step 4
+   - If not exists, proceed to step 2
+
+2. Scan ALL legacy paths: `.claude/CONTINUITY.md`, `.gemini/CONTINUITY.md`, `.codex/CONTINUITY.md`
+
+3. Handle legacy files based on whether `.ai/CONTINUITY.md` exists:
+   - See "Legacy Check Logic" section below
+
+4. If `.ai/CONTINUITY.md` exists, display contents
+
+5. Ask user: "Update continuity?"
+
+6. If yes, write new summary using the expanded format below
+
+## Legacy Check Logic
+
+### Case A: `.ai/CONTINUITY.md` EXISTS + legacy files found
+Display warning:
+```
+⚠️ Found legacy continuity files:
+- .claude/CONTINUITY.md (Source line from file)
+- .gemini/CONTINUITY.md (Source line from file)
+[list all that exist]
+
+These may be stale. Consider deleting them after verifying
+.ai/CONTINUITY.md has the latest context.
+```
+After user acknowledges, create `.ai/.legacy-checked` with current UTC timestamp.
+
+### Case B: `.ai/CONTINUITY.md` DOES NOT EXIST + ONE legacy file found
+```
+Found legacy continuity file at [path].
+Migrate to unified location (.ai/CONTINUITY.md)?
+```
+If yes, migrate content (convert to new format if possible), then create `.ai/.legacy-checked`.
+
+### Case C: `.ai/CONTINUITY.md` DOES NOT EXIST + MULTIPLE legacy files found
+```
+Found multiple legacy continuity files:
+- .claude/CONTINUITY.md (Source line from file)
+- .gemini/CONTINUITY.md (Source line from file)
+[list all that exist with their Source timestamps]
+
+Which would you like to migrate to .ai/CONTINUITY.md?
+```
+Let user choose, migrate selected file, then create `.ai/.legacy-checked`.
+
+### Case D: No legacy files found
+Proceed normally. Create `.ai/.legacy-checked` when first writing `.ai/CONTINUITY.md`.
+
+## Format (~500 tokens)
+
 ```markdown
 # Continuity
 
-## Done
-[Brief summary of completed work]
+## Summary
+[High-level project context - what is being built and why, 1-2 sentences]
 
-## Next
-[What to work on next]
+## Completed
+- [Finished work item 1]
+- [Finished work item 2]
+- [etc.]
+
+## In Progress
+- [Active work item not yet complete]
+
+## Blocked
+[Impediments or decisions needed - or "None"]
+
+## Key Files
+- `path/to/important/file.ext` - [brief description]
+- `path/to/another/file.ext` - [brief description]
+
+## Context
+[Session-specific state: user preferences, environment details, constraints]
+
+## Suggested Prompt
+> [Actionable, copy-pasteable prompt to continue the work]
+> [Include specific next steps and any pending decisions]
 
 ## Source
 [Tool Name] | [YYYY-MM-DD HH:MM UTC]
 ```
 
 ## Rules
-- Keep each section to 1-2 lines
+
+- Total content should be approximately 500 tokens
+- Prioritize the Suggested Prompt section (~120 tokens) - this is the key handoff mechanism
+- Keep Summary concise (1-2 sentences)
+- List only the most relevant Key Files (3-5 max)
 - Use UTC timezone (run `date -u "+%Y-%m-%d %H:%M UTC"`)
-- Include tool name that performed the update (e.g., "Claude Code")
+- Tool name is "Claude Code"
+
+## Update Rules (CRITICAL)
+
+When updating an existing file, you MUST:
+
+1. **Prune "In Progress"** - Move completed items to "Completed", remove finished work entirely from this section. Only list work that is genuinely incomplete.
+
+2. **Prune "Completed"** - Keep only the 5-7 most recent/relevant items. Remove old items that are no longer useful context for the next session.
+
+3. **Refresh "Suggested Prompt"** - This MUST reflect the ACTUAL next steps. Never leave stale instructions. Ask yourself: "If I started a fresh session and copy-pasted this prompt, would it make sense?"
+
+4. **Update "Context"** - Remove outdated statements. If something was true last session but isn't now (e.g., "uncommitted changes" after committing), remove it.
+
+5. **Update "Key Files"** - Reflect currently relevant files, not historical ones.
