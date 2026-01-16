@@ -477,11 +477,14 @@ class InstallingScreen(Screen):
         dst_config = claude_dir / "CLAUDE.md"
         install_managed_config(src_config, dst_config)
 
-        src_cmd = repo / "features" / feature / "claude" / "commands" / f"{feature}.md"
-        dst_cmd = commands_dir / f"{feature}.md"
-        if dst_cmd.exists():
-            dst_cmd.unlink()
-        dst_cmd.symlink_to(src_cmd)
+        # Install all command files from the feature's commands directory
+        src_commands_dir = repo / "features" / feature / "claude" / "commands"
+        if src_commands_dir.exists():
+            for src_cmd in src_commands_dir.glob("*.md"):
+                dst_cmd = commands_dir / src_cmd.name
+                if dst_cmd.exists():
+                    dst_cmd.unlink()
+                dst_cmd.symlink_to(src_cmd)
 
     async def install_gemini(self, home: Path, repo: Path, feature: str) -> None:
         gemini_dir = home / ".gemini"
@@ -495,7 +498,12 @@ class InstallingScreen(Screen):
 
         src_ext = repo / "features" / feature / "gemini" / "extensions" / feature
         (ext_dir / "gemini-extension.json").write_text((src_ext / "gemini-extension.json").read_text())
-        (cmd_dir / f"{feature}.toml").write_text((src_ext / "commands" / f"{feature}.toml").read_text())
+
+        # Install all command files from the feature's commands directory
+        src_commands_dir = src_ext / "commands"
+        if src_commands_dir.exists():
+            for src_cmd in src_commands_dir.glob("*.toml"):
+                (cmd_dir / src_cmd.name).write_text(src_cmd.read_text())
 
         enablement_path = gemini_dir / "extensions" / "extension-enablement.json"
         update_enablement(enablement_path, feature)
@@ -509,11 +517,14 @@ class InstallingScreen(Screen):
         dst_config = codex_dir / "AGENTS.md"
         install_managed_config(src_config, dst_config)
 
-        src_prompt = repo / "features" / feature / "codex" / "prompts" / f"{feature}.md"
-        dst_prompt = prompts_dir / f"{feature}.md"
-        if dst_prompt.exists():
-            dst_prompt.unlink()
-        dst_prompt.symlink_to(src_prompt)
+        # Install all prompt files from the feature's prompts directory
+        src_prompts_dir = repo / "features" / feature / "codex" / "prompts"
+        if src_prompts_dir.exists():
+            for src_prompt in src_prompts_dir.glob("*.md"):
+                dst_prompt = prompts_dir / src_prompt.name
+                if dst_prompt.exists():
+                    dst_prompt.unlink()
+                dst_prompt.symlink_to(src_prompt)
 
 
 class DoneScreen(Screen):
