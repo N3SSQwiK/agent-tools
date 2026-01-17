@@ -167,6 +167,7 @@ TOOLS = [
 
 FEATURES = [
     Feature("continuity", "continuity", "Session continuity tracking across projects", True),
+    Feature("maestro", "maestro", "Multi-agent orchestration with hub-spoke model", False),
 ]
 
 
@@ -446,7 +447,38 @@ class InstallingScreen(Screen):
     @work(exclusive=True)
     async def run_installation(self) -> None:
         items = list(self.query(ProgressItem))
+        home = Path.home()
+        repo = self.app.repo_path
 
+        # Get selected features
+        selected_features = [f.id for f in FEATURES if f.selected]
+
+        # Write managed configs once per tool (rebuild from all selected features)
+        # Only write if tool directory exists (indicates tool is installed and has been run)
+        selected_tools = [t.id for t in TOOLS if t.selected]
+        if "claude" in selected_tools:
+            claude_dir = home / ".claude"
+            if claude_dir.exists():
+                src_paths = [repo / "features" / f / "claude" / "CLAUDE.md" for f in selected_features]
+                write_managed_config(claude_dir / "CLAUDE.md", src_paths)
+            else:
+                self.notify("Skipping Claude config - ~/.claude not found. Install Claude Code and run it once, then re-run this installer.", severity="warning")
+        if "gemini" in selected_tools:
+            gemini_dir = home / ".gemini"
+            if gemini_dir.exists():
+                src_paths = [repo / "features" / f / "gemini" / "GEMINI.md" for f in selected_features]
+                write_managed_config(gemini_dir / "GEMINI.md", src_paths)
+            else:
+                self.notify("Skipping Gemini config - ~/.gemini not found. Install Gemini CLI and run it once, then re-run this installer.", severity="warning")
+        if "codex" in selected_tools:
+            codex_dir = home / ".codex"
+            if codex_dir.exists():
+                src_paths = [repo / "features" / f / "codex" / "AGENTS.md" for f in selected_features]
+                write_managed_config(codex_dir / "AGENTS.md", src_paths)
+            else:
+                self.notify("Skipping Codex config - ~/.codex not found. Install Codex CLI and run it once, then re-run this installer.", severity="warning")
+
+        # Install command files per feature
         for i, (step_name, tool_id, feature_id) in enumerate(self.steps):
             items[i].set_status("active")
             await self.install_step(tool_id, feature_id)
@@ -472,15 +504,14 @@ class InstallingScreen(Screen):
         commands_dir = claude_dir / "commands"
         commands_dir.mkdir(parents=True, exist_ok=True)
 
-        src_config = repo / "features" / feature / "claude" / "CLAUDE.md"
-        dst_config = claude_dir / "CLAUDE.md"
-        install_managed_config(src_config, dst_config)
-
-        src_cmd = repo / "features" / feature / "claude" / "commands" / f"{feature}.md"
-        dst_cmd = commands_dir / f"{feature}.md"
-        if dst_cmd.exists():
-            dst_cmd.unlink()
-        dst_cmd.symlink_to(src_cmd)
+        # Install all command files from the feature's commands directory
+        src_commands_dir = repo / "features" / feature / "claude" / "commands"
+        if src_commands_dir.exists():
+            for src_cmd in src_commands_dir.glob("*.md"):
+                dst_cmd = commands_dir / src_cmd.name
+                if dst_cmd.exists():
+                    dst_cmd.unlink()
+                dst_cmd.symlink_to(src_cmd)
 
     async def install_gemini(self, home: Path, repo: Path, feature: str) -> None:
         gemini_dir = home / ".gemini"
@@ -488,13 +519,14 @@ class InstallingScreen(Screen):
         cmd_dir = ext_dir / "commands"
         cmd_dir.mkdir(parents=True, exist_ok=True)
 
-        src_config = repo / "features" / feature / "gemini" / "GEMINI.md"
-        dst_config = gemini_dir / "GEMINI.md"
-        install_managed_config(src_config, dst_config)
-
         src_ext = repo / "features" / feature / "gemini" / "extensions" / feature
         (ext_dir / "gemini-extension.json").write_text((src_ext / "gemini-extension.json").read_text())
-        (cmd_dir / f"{feature}.toml").write_text((src_ext / "commands" / f"{feature}.toml").read_text())
+
+        # Install all command files from the feature's commands directory
+        src_commands_dir = src_ext / "commands"
+        if src_commands_dir.exists():
+            for src_cmd in src_commands_dir.glob("*.toml"):
+                (cmd_dir / src_cmd.name).write_text(src_cmd.read_text())
 
         enablement_path = gemini_dir / "extensions" / "extension-enablement.json"
         update_enablement(enablement_path, feature)
@@ -504,15 +536,14 @@ class InstallingScreen(Screen):
         prompts_dir = codex_dir / "prompts"
         prompts_dir.mkdir(parents=True, exist_ok=True)
 
-        src_config = repo / "features" / feature / "codex" / "AGENTS.md"
-        dst_config = codex_dir / "AGENTS.md"
-        install_managed_config(src_config, dst_config)
-
-        src_prompt = repo / "features" / feature / "codex" / "prompts" / f"{feature}.md"
-        dst_prompt = prompts_dir / f"{feature}.md"
-        if dst_prompt.exists():
-            dst_prompt.unlink()
-        dst_prompt.symlink_to(src_prompt)
+        # Install all prompt files from the feature's prompts directory
+        src_prompts_dir = repo / "features" / feature / "codex" / "prompts"
+        if src_prompts_dir.exists():
+            for src_prompt in src_prompts_dir.glob("*.md"):
+                dst_prompt = prompts_dir / src_prompt.name
+                if dst_prompt.exists():
+                    dst_prompt.unlink()
+                dst_prompt.symlink_to(src_prompt)
 
 
 class DoneScreen(Screen):
@@ -553,16 +584,26 @@ class DoneScreen(Screen):
 # HELPERS
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-START_MARKER = "<!-- AGENT-TOOLS:START -->"
-END_MARKER = "<!-- AGENT-TOOLS:END -->"
+START_MARKER = "<!-- Nexus-AI:START -->"
+END_MARKER = "<!-- Nexus-AI:END -->"
 
 
-def install_managed_config(src_path: Path, dst_path: Path) -> None:
-    if not src_path.exists():
+def write_managed_config(dst_path: Path, src_paths: list[Path]) -> None:
+    """Rebuild managed block from all feature configs (replaces existing block entirely)."""
+    # Collect content from all source files that exist
+    contents = []
+    for src_path in src_paths:
+        if src_path.exists():
+            content = src_path.read_text().strip()
+            if content:
+                contents.append(content)
+
+    if not contents:
         return
 
-    src_content = src_path.read_text()
-    managed_block = f"{START_MARKER}\n{src_content}\n{END_MARKER}"
+    # Build the managed block from all features with global header
+    merged = "\n\n".join(contents)
+    managed_block = f"{START_MARKER}\n# Global Instructions\n\n{merged}\n{END_MARKER}"
 
     if not dst_path.exists():
         dst_path.write_text(managed_block)
@@ -570,11 +611,13 @@ def install_managed_config(src_path: Path, dst_path: Path) -> None:
 
     existing = dst_path.read_text()
 
-    if START_MARKER in existing:
-        start = existing.index(START_MARKER)
-        end = existing.index(END_MARKER) + len(END_MARKER)
-        content = existing[:start] + managed_block + existing[end:]
+    if START_MARKER in existing and END_MARKER in existing:
+        # Replace existing managed block entirely
+        block_start = existing.index(START_MARKER)
+        block_end = existing.index(END_MARKER) + len(END_MARKER)
+        content = existing[:block_start] + managed_block + existing[block_end:]
     else:
+        # No existing block, append new one
         content = existing + "\n" + managed_block
 
     dst_path.write_text(content)

@@ -1,0 +1,6 @@
+{
+  "name": "maestro",
+  "version": "1.0.0",
+  "description": "Multi-agent orchestration with hub-spoke model",
+  "contextFileName": "GEMINI.md"
+}

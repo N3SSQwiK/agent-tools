@@ -1,42 +1,39 @@
 # Continuity
 
 ## Summary
-Nexus-AI is a TUI installer for configuring AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI) with shared features. Currently implementing unified session continuity to eliminate context loss when switching between tools.
+Nexus-AI is a TUI installer for configuring AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI) with shared features. Maestro v2 multi-agent orchestration implemented on `feature/maestro-v2` branch (PR #2).
 
 ## Completed
-- Fixed banner red border colors, removed Go installer
-- Added `.gitignore` and `requirements.txt` for Python venv
-- Renamed `installer.py` to `nexus.py`, streamlined startup
-- Updated statusline to show `model.id` and `cost.total_cost_usd`
-- Created OpenSpec proposal for unified continuity (`openspec/changes/unify-continuity-file/`)
-- Implemented unified continuity feature on `feat/unify-continuity-file` branch:
-  - Updated global instructions (3 files) to reference `.ai/CONTINUITY.md`
-  - Updated slash commands (3 files) with expanded ~500 token format
-  - Added migration logic for legacy per-tool files
+- Maestro v2 implementation (18 slash commands across 3 tools)
+- Fixed installer bugs: multi-command glob patterns, attribute names, directory existence checks
+- Refactored config merging to rebuild entire managed block (prevents stale content)
+- Renamed managed block markers `AGENT-TOOLS` → `Nexus-AI`
+- Fixed duplicate `# Global Instructions` header in merged configs
+- Created OpenSpec proposal documenting installer specification
+- Added smoke test procedure to installer design doc
 
 ## In Progress
-- Testing and committing the unified continuity implementation
-- Migrating legacy `.claude/CONTINUITY.md` to unified location (this file)
+- PR #2 awaiting final review/merge
 
 ## Blocked
 None
 
 ## Key Files
-- `features/continuity/claude/commands/continuity.md` - Claude slash command
-- `features/continuity/gemini/extensions/continuity/commands/continuity.toml` - Gemini extension
-- `features/continuity/codex/prompts/continuity.md` - Codex prompt
-- `openspec/changes/unify-continuity-file/` - Proposal with design.md, tasks.md, spec.md
+- `installer/python/nexus.py` - TUI installer with `write_managed_config()` rebuild logic
+- `openspec/changes/document-installer-spec/` - Installer specification proposal
+- `features/maestro/` - All maestro commands and docs for 3 CLI tools
 
 ## Context
-- User is on Claude Pro/Max subscription, added API cost estimate to statusline for plan comparison
-- All three AI tools use additive config loading (global + project files concatenated)
-- Feature branch `feat/unify-continuity-file` has uncommitted implementation changes
+- All Codex PR review comments addressed
+- Smoke test passes programmatically (dataclass attrs, config merging, feature paths)
+- Pre-merge smoke test items checked off in PR test plan
+- OpenSpec installer proposal needs user approval before archiving
 
 ## Suggested Prompt
-> Commit the unified continuity implementation on `feat/unify-continuity-file` branch.
-> Then reinstall the continuity feature (`./install.sh`) to deploy the updated
-> commands to `~/.claude/commands/`. After verifying the migration worked,
-> delete the legacy file at `.claude/CONTINUITY.md`.
+> Review and merge PR #2 for Maestro v2. After merge, approve the OpenSpec installer
+> proposal (`openspec/changes/document-installer-spec/`) and archive it to create
+> `specs/installer/`. Then test installation with `./install.sh` selecting all tools
+> and features to verify end-to-end flow.
 
 ## Source
-Claude Code | 2026-01-15 20:34 UTC
+Claude Code | 2026-01-17 02:10 UTC

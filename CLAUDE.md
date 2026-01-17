@@ -56,24 +56,27 @@ Features live in `features/<name>/` with tool-specific subdirectories:
 ```
 features/<name>/
 ├── claude/
-│   ├── CLAUDE.md              # Global instructions (merged)
-│   └── commands/<name>.md     # Slash command (symlinked)
+│   ├── CLAUDE.md                 # Global instructions (merged)
+│   └── commands/<name>[-*].md    # Slash command(s) (symlinked)
 ├── gemini/
-│   ├── GEMINI.md              # Global instructions (merged)
-│   └── extensions/<name>/     # Extension bundle (copied)
+│   ├── GEMINI.md                 # Global instructions (merged)
+│   └── extensions/<name>/        # Extension bundle (copied)
 └── codex/
-    ├── AGENTS.md              # Global instructions (merged)
-    └── prompts/<name>.md      # Prompt (symlinked)
+    ├── AGENTS.md                 # Global instructions (merged)
+    └── prompts/<name>[-*].md     # Prompt(s) (symlinked)
 ```
+
+Multi-command features use the `<name>-<subcommand>.md` pattern (e.g., `maestro-plan.md`, `maestro-run.md`).
 
 ### Managed Blocks
 Config files use markers to preserve user content during updates:
 ```markdown
-<!-- AGENT-TOOLS:START -->
-[Installer-managed content]
-<!-- AGENT-TOOLS:END -->
+<!-- Nexus-AI:START -->
+# Global Instructions
+[Installer-managed content from all features]
+<!-- Nexus-AI:END -->
 ```
-The `install_managed_config()` function in `nexus.py:560` handles merging.
+The `write_managed_config()` function in `nexus.py` rebuilds the entire block from all selected features.
 
 ## Design
 
