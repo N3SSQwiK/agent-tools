@@ -601,9 +601,9 @@ def write_managed_config(dst_path: Path, src_paths: list[Path]) -> None:
     if not contents:
         return
 
-    # Build the managed block from all features
+    # Build the managed block from all features with global header
     merged = "\n\n".join(contents)
-    managed_block = f"{START_MARKER}\n{merged}\n{END_MARKER}"
+    managed_block = f"{START_MARKER}\n# Global Instructions\n\n{merged}\n{END_MARKER}"
 
     if not dst_path.exists():
         dst_path.write_text(managed_block)
