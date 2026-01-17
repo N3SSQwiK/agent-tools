@@ -136,21 +136,25 @@ Multi-agent orchestration system enabling any AI tool to coordinate complex task
 ```
 features/<feature-name>/
 ├── claude/
-│   ├── CLAUDE.md              # Global instructions (optional)
+│   ├── CLAUDE.md              # Global instructions (merged, optional)
 │   └── commands/
-│       └── <feature-name>.md  # Slash command
+│       └── <feature-name>[-*].md   # Slash command(s)
 ├── gemini/
-│   ├── GEMINI.md              # Global instructions (optional)
+│   ├── GEMINI.md              # Global instructions (merged, optional)
 │   └── extensions/
 │       └── <feature-name>/
 │           ├── gemini-extension.json
 │           └── commands/
-│               └── <feature-name>.toml
+│               └── <feature-name>[-*].toml
 └── codex/
-    ├── AGENTS.md              # Global instructions (optional)
+    ├── AGENTS.md              # Global instructions (merged, optional)
     └── prompts/
-        └── <feature-name>.md  # Slash command
+        └── <feature-name>[-*].md   # Slash command(s)
 ```
+
+**Single vs. multi-command features:**
+- Single command: `continuity.md`
+- Multiple commands: `maestro-plan.md`, `maestro-run.md`, `maestro-status.md`, etc.
 
 ## Managed Blocks
 

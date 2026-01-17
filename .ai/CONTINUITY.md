@@ -1,39 +1,39 @@
 # Continuity
 
 ## Summary
-Nexus-AI is a TUI installer for configuring AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI) with shared features. Implemented Maestro v2 multi-agent orchestration system.
+Nexus-AI is a TUI installer for configuring AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI) with shared features. Maestro v2 multi-agent orchestration implemented on `feature/maestro-v2` branch (PR #2).
 
 ## Completed
-- Unified continuity feature merged (PR #1)
-- Maestro v2 implementation on `feature/maestro-v2` branch:
-  - Archived v1 docs to `docs/maestro-v1/`
-  - Created 6 slash commands for all 3 tools (18 total)
-  - Added infrastructure docs (STATE-FILE-SPEC.md, SPOKE-CONTRACT.md)
-  - Added user docs (README, USER-GUIDE, TROUBLESHOOTING)
-  - Registered maestro feature in installer (default: disabled)
-- Fixed installer to support multi-command features (glob pattern)
-- PR #2 created for Maestro v2
+- Maestro v2 implementation (18 slash commands across 3 tools)
+- Fixed installer bugs: multi-command glob patterns, attribute names, directory existence checks
+- Refactored config merging to rebuild entire managed block (prevents stale content)
+- Renamed managed block markers `AGENT-TOOLS` → `Nexus-AI`
+- Fixed duplicate `# Global Instructions` header in merged configs
+- Created OpenSpec proposal documenting installer specification
+- Added smoke test procedure to installer design doc
 
 ## In Progress
-- PR #2 awaiting review/merge
+- PR #2 awaiting final review/merge
 
 ## Blocked
 None
 
 ## Key Files
-- `features/maestro/` - All maestro commands and docs
-- `openspec/changes/rebuild-maestro-orchestration/` - Proposal, design, tasks
-- `installer/python/nexus.py` - TUI installer with multi-command support
+- `installer/python/nexus.py` - TUI installer with `write_managed_config()` rebuild logic
+- `openspec/changes/document-installer-spec/` - Installer specification proposal
+- `features/maestro/` - All maestro commands and docs for 3 CLI tools
 
 ## Context
-- Maestro v2 is tool-agnostic hub-spoke orchestration (any tool can be hub)
-- 6 commands: plan, challenge, run, review, status, report
-- Cross-tool integration testing still pending (requires runtime)
+- All Codex PR review comments addressed
+- Smoke test passes programmatically (dataclass attrs, config merging, feature paths)
+- Pre-merge smoke test items checked off in PR test plan
+- OpenSpec installer proposal needs user approval before archiving
 
 ## Suggested Prompt
-> Merge PR #2 for Maestro v2. Then run `./install.sh` selecting Claude + Maestro
-> to test installation. Verify `/maestro status` works in a fresh Claude session.
-> Consider archiving the OpenSpec change after merge.
+> Review and merge PR #2 for Maestro v2. After merge, approve the OpenSpec installer
+> proposal (`openspec/changes/document-installer-spec/`) and archive it to create
+> `specs/installer/`. Then test installation with `./install.sh` selecting all tools
+> and features to verify end-to-end flow.
 
 ## Source
-Claude Code | 2026-01-16 14:51 UTC
+Claude Code | 2026-01-17 02:10 UTC
