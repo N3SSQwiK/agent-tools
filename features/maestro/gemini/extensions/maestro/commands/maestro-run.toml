@@ -53,7 +53,10 @@ Return result as markdown with Status, Summary, Changes, Verification, Issues se
 
 ## CLI Dispatch Patterns
 
-### Gemini CLI (self)
+### Gemini CLI
+```bash
+gemini -p "<handoff prompt>" -y -o json
+```
 Use @path/to/file for file references (9.2x token efficiency).
 
 ### Codex CLI
@@ -62,7 +65,10 @@ codex exec "<handoff prompt>" --full-auto --json
 ```
 
 ### Claude Code
-Claude Code runs interactively. Provide handoff via direct prompt.
+```bash
+claude -p "<handoff prompt>" --output-format json
+```
+Use `--max-turns N` to limit agentic turns, `--dangerously-skip-permissions` for full automation.
 
 ## Precondition Checks (AAVSR)
 - **Atomic:** Single responsibility, one clear outcome?

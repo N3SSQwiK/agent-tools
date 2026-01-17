@@ -68,6 +68,12 @@ Use `@path/to/file` for file references (9.2x token efficiency).
 codex exec "<handoff prompt>" --full-auto --json
 ```
 
+### Claude Code
+```bash
+claude -p "<handoff prompt>" --output-format json
+```
+Use `--max-turns N` to limit agentic turns, `--dangerously-skip-permissions` for full automation in trusted environments.
+
 ## Precondition Checks (AAVSR)
 
 Before dispatch, validate:

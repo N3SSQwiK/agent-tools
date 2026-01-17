@@ -60,13 +60,16 @@ gemini -p "<handoff prompt>" -y -o json
 ```
 Use `@path/to/file` for file references (9.2x token efficiency).
 
-### Claude Code
-Claude Code runs interactively. Provide handoff via direct prompt.
-
-### Codex CLI (self)
+### Codex CLI
 ```bash
 codex exec "<handoff prompt>" --full-auto --json
 ```
+
+### Claude Code
+```bash
+claude -p "<handoff prompt>" --output-format json
+```
+Use `--max-turns N` to limit agentic turns, `--dangerously-skip-permissions` for full automation.
 
 ## Precondition Checks (AAVSR)
 
