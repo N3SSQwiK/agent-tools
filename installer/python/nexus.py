@@ -570,23 +570,40 @@ END_MARKER = "<!-- AGENT-TOOLS:END -->"
 
 
 def install_managed_config(src_path: Path, dst_path: Path) -> None:
+    """Install feature config into managed block, merging with existing content."""
     if not src_path.exists():
         return
 
-    src_content = src_path.read_text()
-    managed_block = f"{START_MARKER}\n{src_content}\n{END_MARKER}"
+    new_content = src_path.read_text().strip()
 
     if not dst_path.exists():
+        managed_block = f"{START_MARKER}\n{new_content}\n{END_MARKER}"
         dst_path.write_text(managed_block)
         return
 
     existing = dst_path.read_text()
 
-    if START_MARKER in existing:
-        start = existing.index(START_MARKER)
-        end = existing.index(END_MARKER) + len(END_MARKER)
-        content = existing[:start] + managed_block + existing[end:]
+    if START_MARKER in existing and END_MARKER in existing:
+        # Extract existing managed content
+        start = existing.index(START_MARKER) + len(START_MARKER)
+        end = existing.index(END_MARKER)
+        existing_managed = existing[start:end].strip()
+
+        # Check if new content is already present (avoid duplicates)
+        if new_content in existing_managed:
+            return
+
+        # Merge: append new content to existing
+        merged = f"{existing_managed}\n\n{new_content}" if existing_managed else new_content
+        managed_block = f"{START_MARKER}\n{merged}\n{END_MARKER}"
+
+        # Replace the old block with merged block
+        block_start = existing.index(START_MARKER)
+        block_end = existing.index(END_MARKER) + len(END_MARKER)
+        content = existing[:block_start] + managed_block + existing[block_end:]
     else:
+        # No existing block, append new one
+        managed_block = f"{START_MARKER}\n{new_content}\n{END_MARKER}"
         content = existing + "\n" + managed_block
 
     dst_path.write_text(content)
