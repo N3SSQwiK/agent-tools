@@ -454,16 +454,29 @@ class InstallingScreen(Screen):
         selected_features = [f.directory for f in FEATURES if f.selected]
 
         # Write managed configs once per tool (rebuild from all selected features)
+        # Only write if tool directory exists (indicates tool is installed and has been run)
         selected_tools = [t.name for t in TOOLS if t.selected]
         if "claude" in selected_tools:
-            src_paths = [repo / "features" / f / "claude" / "CLAUDE.md" for f in selected_features]
-            write_managed_config(home / ".claude" / "CLAUDE.md", src_paths)
+            claude_dir = home / ".claude"
+            if claude_dir.exists():
+                src_paths = [repo / "features" / f / "claude" / "CLAUDE.md" for f in selected_features]
+                write_managed_config(claude_dir / "CLAUDE.md", src_paths)
+            else:
+                self.notify("Skipping Claude config - ~/.claude not found. Install Claude Code and run it once, then re-run this installer.", severity="warning")
         if "gemini" in selected_tools:
-            src_paths = [repo / "features" / f / "gemini" / "GEMINI.md" for f in selected_features]
-            write_managed_config(home / ".gemini" / "GEMINI.md", src_paths)
+            gemini_dir = home / ".gemini"
+            if gemini_dir.exists():
+                src_paths = [repo / "features" / f / "gemini" / "GEMINI.md" for f in selected_features]
+                write_managed_config(gemini_dir / "GEMINI.md", src_paths)
+            else:
+                self.notify("Skipping Gemini config - ~/.gemini not found. Install Gemini CLI and run it once, then re-run this installer.", severity="warning")
         if "codex" in selected_tools:
-            src_paths = [repo / "features" / f / "codex" / "AGENTS.md" for f in selected_features]
-            write_managed_config(home / ".codex" / "AGENTS.md", src_paths)
+            codex_dir = home / ".codex"
+            if codex_dir.exists():
+                src_paths = [repo / "features" / f / "codex" / "AGENTS.md" for f in selected_features]
+                write_managed_config(codex_dir / "AGENTS.md", src_paths)
+            else:
+                self.notify("Skipping Codex config - ~/.codex not found. Install Codex CLI and run it once, then re-run this installer.", severity="warning")
 
         # Install command files per feature
         for i, (step_name, tool_id, feature_id) in enumerate(self.steps):
