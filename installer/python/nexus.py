@@ -509,9 +509,9 @@ class InstallingScreen(Screen):
         if src_commands_dir.exists():
             for src_cmd in src_commands_dir.glob("*.md"):
                 dst_cmd = commands_dir / src_cmd.name
-                if dst_cmd.exists():
+                if dst_cmd.exists() or dst_cmd.is_symlink():
                     dst_cmd.unlink()
-                dst_cmd.symlink_to(src_cmd)
+                dst_cmd.write_text(src_cmd.read_text())
 
     async def install_gemini(self, home: Path, repo: Path, feature: str) -> None:
         gemini_dir = home / ".gemini"
@@ -541,9 +541,9 @@ class InstallingScreen(Screen):
         if src_prompts_dir.exists():
             for src_prompt in src_prompts_dir.glob("*.md"):
                 dst_prompt = prompts_dir / src_prompt.name
-                if dst_prompt.exists():
+                if dst_prompt.exists() or dst_prompt.is_symlink():
                     dst_prompt.unlink()
-                dst_prompt.symlink_to(src_prompt)
+                dst_prompt.write_text(src_prompt.read_text())
 
 
 class DoneScreen(Screen):

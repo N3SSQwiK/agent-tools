@@ -47,9 +47,9 @@ installer/python/venv/bin/python installer/python/nexus.py
 ### Installation Flow
 1. WelcomeScreen → ToolsScreen (select assistants) → FeaturesScreen → InstallingScreen → DoneScreen
 2. Each tool installs to its config directory:
-   - Claude: `~/.claude/commands/` (symlinks)
+   - Claude: `~/.claude/commands/` (copies)
    - Gemini: `~/.gemini/extensions/` (copies + JSON enablement)
-   - Codex: `~/.codex/prompts/` (symlinks)
+   - Codex: `~/.codex/prompts/` (copies)
 
 ### Feature Structure
 Features live in `features/<name>/` with tool-specific subdirectories:
@@ -57,13 +57,13 @@ Features live in `features/<name>/` with tool-specific subdirectories:
 features/<name>/
 ├── claude/
 │   ├── CLAUDE.md                 # Global instructions (merged)
-│   └── commands/<name>[-*].md    # Slash command(s) (symlinked)
+│   └── commands/<name>[-*].md    # Slash command(s) (copied)
 ├── gemini/
 │   ├── GEMINI.md                 # Global instructions (merged)
 │   └── extensions/<name>/        # Extension bundle (copied)
 └── codex/
     ├── AGENTS.md                 # Global instructions (merged)
-    └── prompts/<name>[-*].md     # Prompt(s) (symlinked)
+    └── prompts/<name>[-*].md     # Prompt(s) (copied)
 ```
 
 Multi-command features use the `<name>-<subcommand>.md` pattern (e.g., `maestro-plan.md`, `maestro-run.md`).

@@ -104,12 +104,12 @@ The installer MUST rebuild the managed block from all selected features on each 
 - **And** notifies the user to install and run the CLI tool first
 
 ### Requirement: Claude Code Installation
-The installer MUST install Claude Code features using symlinks.
+The installer MUST install Claude Code features using file copies.
 
-#### Scenario: Command symlink creation
+#### Scenario: Command file copy
 - **Given** a feature with command files in `features/<feature>/claude/commands/`
 - **When** installing for Claude Code
-- **Then** the installer creates symlinks from `~/.claude/commands/` to the source files
+- **Then** the installer copies files from source to `~/.claude/commands/`
 
 #### Scenario: Config installation
 - **Given** a feature with `features/<feature>/claude/CLAUDE.md`
@@ -120,6 +120,11 @@ The installer MUST install Claude Code features using symlinks.
 - **Given** `~/.claude/commands/` does not exist
 - **When** installing for Claude Code
 - **Then** the installer creates the directory with appropriate permissions
+
+#### Scenario: Existing symlink replacement
+- **Given** a symlink exists at the destination from a previous installation
+- **When** re-running the installer
+- **Then** the installer removes the symlink and creates a file copy
 
 ### Requirement: Gemini CLI Installation
 The installer MUST install Gemini CLI features using file copies and extension enablement.
@@ -145,17 +150,22 @@ The installer MUST install Gemini CLI features using file copies and extension e
 - **Then** the installer merges content into `~/.gemini/GEMINI.md` managed block
 
 ### Requirement: Codex CLI Installation
-The installer MUST install Codex CLI features using symlinks.
+The installer MUST install Codex CLI features using file copies.
 
-#### Scenario: Prompt symlink creation
+#### Scenario: Prompt file copy
 - **Given** a feature with prompt files in `features/<feature>/codex/prompts/`
 - **When** installing for Codex CLI
-- **Then** the installer creates symlinks from `~/.codex/prompts/` to the source files
+- **Then** the installer copies files from source to `~/.codex/prompts/`
 
 #### Scenario: Config installation
 - **Given** a feature with `features/<feature>/codex/AGENTS.md`
 - **When** installing for Codex CLI
 - **Then** the installer merges content into `~/.codex/AGENTS.md` managed block
+
+#### Scenario: Existing symlink replacement
+- **Given** a symlink exists at the destination from a previous installation
+- **When** re-running the installer
+- **Then** the installer removes the symlink and creates a file copy
 
 ### Requirement: Feature Registration
 Features MUST be registered in the installer's FEATURES list to be available for selection.
@@ -196,10 +206,15 @@ The installer MUST guide users through a multi-screen wizard flow.
 ### Requirement: Installation Idempotency
 Re-running the installer MUST be safe and produce consistent results.
 
-#### Scenario: Symlink already exists
-- **Given** a symlink already exists at the destination
+#### Scenario: File already exists
+- **Given** a file already exists at the destination
 - **When** re-running installation
-- **Then** the installer recreates the symlink without error
+- **Then** the installer overwrites the file with current content
+
+#### Scenario: Symlink exists from previous version
+- **Given** a symlink exists at the destination from a prior installation
+- **When** re-running installation
+- **Then** the installer removes the symlink and creates a file copy
 
 #### Scenario: Config already merged
 - **Given** a feature's config is already in the managed block
