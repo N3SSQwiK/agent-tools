@@ -7,12 +7,19 @@
 - [ ] 1.3 Review spec scenarios match actual implementation
 - [ ] 1.4 Validate with `openspec validate document-installer-spec --strict`
 
-## 2. Approval
+## 2. Smoke Test
 
-- [ ] 2.1 User review and approval of specification
-- [ ] 2.2 Address any feedback or corrections
+- [ ] 2.1 Run `./install.sh` and complete the TUI flow
+- [ ] 2.2 Verify no runtime errors (AttributeError, FileNotFoundError, etc.)
+- [ ] 2.3 Verify managed config written to tool directories that exist
+- [ ] 2.4 Verify warning shown for tool directories that don't exist
 
-## 3. Archive
+## 3. Approval
 
-- [ ] 3.1 Run `openspec archive document-installer-spec --yes` to create `specs/installer/`
-- [ ] 3.2 Verify spec appears in `openspec list --specs`
+- [ ] 3.1 User review and approval of specification
+- [ ] 3.2 Address any feedback or corrections
+
+## 4. Archive
+
+- [ ] 4.1 Run `openspec archive document-installer-spec --yes` to create `specs/installer/`
+- [ ] 4.2 Verify spec appears in `openspec list --specs`
