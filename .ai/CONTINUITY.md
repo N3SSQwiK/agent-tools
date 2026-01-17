@@ -1,39 +1,39 @@
 # Continuity
 
 ## Summary
-Nexus-AI is a TUI installer for configuring AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI) with shared features. Maestro v2 multi-agent orchestration implemented on `feature/maestro-v2` branch (PR #2).
+Nexus-AI is a TUI installer for configuring AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI) with shared features. Maestro v2 multi-agent orchestration is complete and all OpenSpec changes archived.
 
 ## Completed
-- Maestro v2 implementation (18 slash commands across 3 tools)
-- Fixed installer bugs: multi-command glob patterns, attribute names, directory existence checks
-- Refactored config merging to rebuild entire managed block (prevents stale content)
-- Renamed managed block markers `AGENT-TOOLS` → `Nexus-AI`
-- Fixed duplicate `# Global Instructions` header in merged configs
-- Created OpenSpec proposal documenting installer specification
-- Added smoke test procedure to installer design doc
+- Merged PR #2: Maestro v2 (18 slash commands across 3 tools)
+- Archived `document-installer-spec` → created `specs/installer/` (9 requirements)
+- Unified installer to use file copies for all tools (symlinks → copies)
+- Archived `rebuild-maestro-orchestration` → created `specs/maestro-orchestration/` (14 requirements)
+- Fixed CLI dispatch patterns in maestro-run commands (added Claude CLI pattern)
+- Expanded USER-GUIDE.md with lifecycle details, flow diagrams, quality gates
 
 ## In Progress
-- PR #2 awaiting final review/merge
+None
 
 ## Blocked
 None
 
 ## Key Files
-- `installer/python/nexus.py` - TUI installer with `write_managed_config()` rebuild logic
-- `openspec/changes/document-installer-spec/` - Installer specification proposal
-- `features/maestro/` - All maestro commands and docs for 3 CLI tools
+- `installer/python/nexus.py` - TUI installer (all tools now use file copies)
+- `openspec/specs/` - 3 specs: continuity, installer, maestro-orchestration
+- `features/maestro/docs/USER-GUIDE.md` - Comprehensive Maestro documentation
+- `docs/FUTURE.md` - Deferred work: duplicate spec detection, cross-tool testing
 
 ## Context
-- All Codex PR review comments addressed
-- Smoke test passes programmatically (dataclass attrs, config merging, feature paths)
-- Pre-merge smoke test items checked off in PR test plan
-- OpenSpec installer proposal needs user approval before archiving
+- All work committed and pushed to `main` branch
+- No active OpenSpec changes (clean slate)
+- Cross-tool hub→spoke testing deferred to future OpenSpec change
+- Installation now uses file copies (self-contained, no repo dependency)
 
 ## Suggested Prompt
-> Review and merge PR #2 for Maestro v2. After merge, approve the OpenSpec installer
-> proposal (`openspec/changes/document-installer-spec/`) and archive it to create
-> `specs/installer/`. Then test installation with `./install.sh` selecting all tools
-> and features to verify end-to-end flow.
+> Run a full installation test with `./install.sh` selecting all tools and Maestro
+> feature. Verify commands are file copies (not symlinks) with `ls -la ~/.claude/commands/`.
+> Then consider creating an OpenSpec change for cross-tool integration testing
+> documented in `docs/FUTURE.md`.
 
 ## Source
-Claude Code | 2026-01-17 02:10 UTC
+Claude Code | 2026-01-17 04:24 UTC
