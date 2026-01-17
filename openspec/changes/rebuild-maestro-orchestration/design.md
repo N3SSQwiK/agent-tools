@@ -471,9 +471,18 @@ codex exec "<prompt>" --full-auto --json
 
 **Note:** Codex operates in full-auto mode, suitable for well-defined atomic tasks.
 
-### Claude Code (Interactive)
+### Claude Code (Headless)
 
-Claude Code runs in interactive mode within the current session. When Claude is the Hub, it delegates to Gemini/Codex via CLI. When Claude is a Spoke, it receives tasks through the state file.
+```bash
+claude -p "<prompt>" --output-format json
+```
+
+**Useful flags:**
+- `--max-turns N` - Limit agentic turns
+- `--dangerously-skip-permissions` - Full automation in trusted environments
+- `--no-session-persistence` - Stateless execution
+
+**Note:** When Claude is the Hub, it delegates to Gemini/Codex via CLI. When Claude is a Spoke, it is invoked via the CLI pattern above.
 
 ## Predefined Specialists
 
