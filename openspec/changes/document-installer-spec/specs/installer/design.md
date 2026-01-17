@@ -175,6 +175,70 @@ class Feature:
 | Gemini extension conflicts | Extension name matches feature name, isolated per-feature |
 | Config file corruption | Managed blocks preserve user content; idempotent merging |
 
+## Testing
+
+### Smoke Test (Required for Every Installer Update)
+
+Run programmatic tests after any changes to `installer/python/nexus.py`:
+
+```bash
+installer/python/venv/bin/python -c "
+import sys
+sys.path.insert(0, 'installer/python')
+from nexus import FEATURES, TOOLS, write_managed_config, START_MARKER, END_MARKER
+from pathlib import Path
+import tempfile
+
+# 1. Verify dataclass attributes
+for f in FEATURES:
+    assert hasattr(f, 'id') and hasattr(f, 'name') and hasattr(f, 'selected')
+for t in TOOLS:
+    assert hasattr(t, 'id') and hasattr(t, 'name') and hasattr(t, 'selected')
+print('✓ Dataclass attributes valid')
+
+# 2. Test write_managed_config
+with tempfile.TemporaryDirectory() as tmpdir:
+    tmpdir = Path(tmpdir)
+    src1, src2 = tmpdir / 'f1.md', tmpdir / 'f2.md'
+    dst = tmpdir / 'CONFIG.md'
+    src1.write_text('# Feature 1')
+    src2.write_text('# Feature 2')
+    write_managed_config(dst, [src1, src2])
+    content = dst.read_text()
+    assert START_MARKER in content and END_MARKER in content
+    write_managed_config(dst, [src1, src2])  # Idempotency
+    assert dst.read_text().count(START_MARKER) == 1
+print('✓ write_managed_config works correctly')
+
+# 3. Verify feature paths exist
+repo = Path.cwd()
+for f in FEATURES:
+    for tool, subdir, pattern in [
+        ('claude', 'commands', f'{f.id}*.md'),
+        ('codex', 'prompts', f'{f.id}*.md'),
+    ]:
+        path = repo / 'features' / f.id / tool / subdir
+        if path.exists():
+            assert list(path.glob(pattern)), f'No commands for {f.id}/{tool}'
+print('✓ Feature paths valid')
+print('=== All smoke tests passed! ===')
+"
+```
+
+### Maintenance
+
+**Important:** When specs are updated, review this test to ensure alignment. The test should:
+- Cover new requirements added to the spec
+- Not produce false positives (passing when it should fail)
+- Not produce false negatives (failing when it should pass)
+
+### When to Run
+
+- After any change to `nexus.py`
+- After adding new features
+- Before merging PRs that touch installer code
+- After spec updates (review test alignment)
+
 ## Open Questions
 
 - Should we support uninstallation (remove symlinks, clean managed blocks)?

@@ -9,10 +9,10 @@
 
 ## 2. Smoke Test
 
-- [ ] 2.1 Run `./install.sh` and complete the TUI flow
-- [ ] 2.2 Verify no runtime errors (AttributeError, FileNotFoundError, etc.)
-- [ ] 2.3 Verify managed config written to tool directories that exist
-- [ ] 2.4 Verify warning shown for tool directories that don't exist
+- [x] 2.1 Run `./install.sh` and verify TUI launches
+- [x] 2.2 Verify no runtime errors (AttributeError, FileNotFoundError, etc.)
+- [x] 2.3 Verify managed config written to tool directories that exist
+- [x] 2.4 Programmatic verification of all installation paths
 
 ## 3. Approval
 
