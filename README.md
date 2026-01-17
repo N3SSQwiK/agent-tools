@@ -157,9 +157,9 @@ features/<feature-name>/
 Config files use managed blocks to preserve your existing configuration:
 
 ```markdown
-<!-- AGENT-TOOLS:START -->
+<!-- Nexus-AI:START -->
 [Installer-managed content]
-<!-- AGENT-TOOLS:END -->
+<!-- Nexus-AI:END -->
 ```
 
 Your content outside these markers is preserved during updates.

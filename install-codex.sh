@@ -6,8 +6,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-START_MARKER="<!-- AGENT-TOOLS:START -->"
-END_MARKER="<!-- AGENT-TOOLS:END -->"
+START_MARKER="<!-- Nexus-AI:START -->"
+END_MARKER="<!-- Nexus-AI:END -->"
 
 echo "Installing Codex CLI tools..."
 

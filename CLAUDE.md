@@ -69,9 +69,9 @@ features/<name>/
 ### Managed Blocks
 Config files use markers to preserve user content during updates:
 ```markdown
-<!-- AGENT-TOOLS:START -->
+<!-- Nexus-AI:START -->
 [Installer-managed content]
-<!-- AGENT-TOOLS:END -->
+<!-- Nexus-AI:END -->
 ```
 The `install_managed_config()` function in `nexus.py:560` handles merging.
 

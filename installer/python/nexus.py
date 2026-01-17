@@ -447,7 +447,25 @@ class InstallingScreen(Screen):
     @work(exclusive=True)
     async def run_installation(self) -> None:
         items = list(self.query(ProgressItem))
+        home = Path.home()
+        repo = self.app.repo_path
 
+        # Get selected features
+        selected_features = [f.directory for f in FEATURES if f.selected]
+
+        # Write managed configs once per tool (rebuild from all selected features)
+        selected_tools = [t.name for t in TOOLS if t.selected]
+        if "claude" in selected_tools:
+            src_paths = [repo / "features" / f / "claude" / "CLAUDE.md" for f in selected_features]
+            write_managed_config(home / ".claude" / "CLAUDE.md", src_paths)
+        if "gemini" in selected_tools:
+            src_paths = [repo / "features" / f / "gemini" / "GEMINI.md" for f in selected_features]
+            write_managed_config(home / ".gemini" / "GEMINI.md", src_paths)
+        if "codex" in selected_tools:
+            src_paths = [repo / "features" / f / "codex" / "AGENTS.md" for f in selected_features]
+            write_managed_config(home / ".codex" / "AGENTS.md", src_paths)
+
+        # Install command files per feature
         for i, (step_name, tool_id, feature_id) in enumerate(self.steps):
             items[i].set_status("active")
             await self.install_step(tool_id, feature_id)
@@ -473,10 +491,6 @@ class InstallingScreen(Screen):
         commands_dir = claude_dir / "commands"
         commands_dir.mkdir(parents=True, exist_ok=True)
 
-        src_config = repo / "features" / feature / "claude" / "CLAUDE.md"
-        dst_config = claude_dir / "CLAUDE.md"
-        install_managed_config(src_config, dst_config)
-
         # Install all command files from the feature's commands directory
         src_commands_dir = repo / "features" / feature / "claude" / "commands"
         if src_commands_dir.exists():
@@ -491,10 +505,6 @@ class InstallingScreen(Screen):
         ext_dir = gemini_dir / "extensions" / feature
         cmd_dir = ext_dir / "commands"
         cmd_dir.mkdir(parents=True, exist_ok=True)
-
-        src_config = repo / "features" / feature / "gemini" / "GEMINI.md"
-        dst_config = gemini_dir / "GEMINI.md"
-        install_managed_config(src_config, dst_config)
 
         src_ext = repo / "features" / feature / "gemini" / "extensions" / feature
         (ext_dir / "gemini-extension.json").write_text((src_ext / "gemini-extension.json").read_text())
@@ -512,10 +522,6 @@ class InstallingScreen(Screen):
         codex_dir = home / ".codex"
         prompts_dir = codex_dir / "prompts"
         prompts_dir.mkdir(parents=True, exist_ok=True)
-
-        src_config = repo / "features" / feature / "codex" / "AGENTS.md"
-        dst_config = codex_dir / "AGENTS.md"
-        install_managed_config(src_config, dst_config)
 
         # Install all prompt files from the feature's prompts directory
         src_prompts_dir = repo / "features" / feature / "codex" / "prompts"
@@ -565,45 +571,40 @@ class DoneScreen(Screen):
 # HELPERS
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-START_MARKER = "<!-- AGENT-TOOLS:START -->"
-END_MARKER = "<!-- AGENT-TOOLS:END -->"
+START_MARKER = "<!-- Nexus-AI:START -->"
+END_MARKER = "<!-- Nexus-AI:END -->"
 
 
-def install_managed_config(src_path: Path, dst_path: Path) -> None:
-    """Install feature config into managed block, merging with existing content."""
-    if not src_path.exists():
+def write_managed_config(dst_path: Path, src_paths: list[Path]) -> None:
+    """Rebuild managed block from all feature configs (replaces existing block entirely)."""
+    # Collect content from all source files that exist
+    contents = []
+    for src_path in src_paths:
+        if src_path.exists():
+            content = src_path.read_text().strip()
+            if content:
+                contents.append(content)
+
+    if not contents:
         return
 
-    new_content = src_path.read_text().strip()
+    # Build the managed block from all features
+    merged = "\n\n".join(contents)
+    managed_block = f"{START_MARKER}\n{merged}\n{END_MARKER}"
 
     if not dst_path.exists():
-        managed_block = f"{START_MARKER}\n{new_content}\n{END_MARKER}"
         dst_path.write_text(managed_block)
         return
 
     existing = dst_path.read_text()
 
     if START_MARKER in existing and END_MARKER in existing:
-        # Extract existing managed content
-        start = existing.index(START_MARKER) + len(START_MARKER)
-        end = existing.index(END_MARKER)
-        existing_managed = existing[start:end].strip()
-
-        # Check if new content is already present (avoid duplicates)
-        if new_content in existing_managed:
-            return
-
-        # Merge: append new content to existing
-        merged = f"{existing_managed}\n\n{new_content}" if existing_managed else new_content
-        managed_block = f"{START_MARKER}\n{merged}\n{END_MARKER}"
-
-        # Replace the old block with merged block
+        # Replace existing managed block entirely
         block_start = existing.index(START_MARKER)
         block_end = existing.index(END_MARKER) + len(END_MARKER)
         content = existing[:block_start] + managed_block + existing[block_end:]
     else:
         # No existing block, append new one
-        managed_block = f"{START_MARKER}\n{new_content}\n{END_MARKER}"
         content = existing + "\n" + managed_block
 
     dst_path.write_text(content)
