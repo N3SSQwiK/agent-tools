@@ -38,3 +38,40 @@ When using `## ADDED Requirements`, a typo like "Instalation" instead of "Instal
 - OpenSpec archive guardrails (MODIFIED catches typos, ADDED doesn't)
 - Levenshtein distance / fuzzy string matching
 - Intent classification in spec-driven workflows
+
+---
+
+## Maestro Cross-Tool Integration Testing
+
+**Added:** 2026-01-17
+**Context:** Deferred from `rebuild-maestro-orchestration` OpenSpec change
+
+### Scope
+
+Validate all hub→spoke dispatch combinations work correctly:
+
+| Hub | Spoke |
+|-----|-------|
+| Claude | → Gemini |
+| Claude | → Codex |
+| Gemini | → Claude |
+| Gemini | → Codex |
+| Codex | → Claude |
+| Codex | → Gemini |
+
+### Test Scenarios
+
+1. **Basic dispatch:** `/maestro plan` creates task, `/maestro run` dispatches to spoke
+2. **Result collection:** Spoke returns structured result, hub parses correctly
+3. **Retry ladder:** Spoke failure triggers appropriate retry/escalation
+4. **Cross-review:** `/maestro review` dispatches completed work to different spoke
+
+### Prerequisites
+
+- All three CLI tools installed and configured
+- Test project with simple, verifiable tasks
+
+### Related
+
+- `features/maestro/docs/USER-GUIDE.md` - execution details
+- `features/maestro/docs/SPOKE-CONTRACT.md` - result format

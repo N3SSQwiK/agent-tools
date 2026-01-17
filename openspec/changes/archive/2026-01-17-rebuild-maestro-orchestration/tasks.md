@@ -196,13 +196,8 @@
 - **Verification:** Maestro commands install correctly via TUI
 
 ### 7.2 Cross-tool integration testing
-- [ ] Test Claude as Hub → Gemini as Spoke
-- [ ] Test Claude as Hub → Codex as Spoke
-- [ ] Test Gemini as Hub → Claude as Spoke
-- [ ] Test Gemini as Hub → Codex as Spoke
-- [ ] Test Codex as Hub → Claude as Spoke
-- [ ] Test Codex as Hub → Gemini as Spoke
-- **Verification:** All hub-spoke combinations work correctly
+- **Deferred:** Cross-tool hub→spoke testing moved to future OpenSpec change
+- **Rationale:** Requires runtime testing; core implementation is complete
 
 ### 7.3 Documentation
 - [x] Write `features/maestro/docs/README.md` - Overview, quick start, prerequisites
@@ -210,7 +205,7 @@
 - [x] Write `features/maestro/docs/TROUBLESHOOTING.md` - Common issues, failure modes, solutions
 - [x] Write `features/maestro/docs/SPOKE-CONTRACT.md` - Tool-agnostic spoke execution contract
 - [x] Write `features/maestro/docs/STATE-FILE-SPEC.md` - `.ai/MAESTRO.md` format specification
-- [ ] Update project README with Maestro feature description
+- [x] Update project README with Maestro feature description
 - **Verification:** Users can understand and use Maestro effectively
 
 ## Dependencies
@@ -243,5 +238,5 @@ Phase 0 (Archive) ─── Phase 1 (Infrastructure) ──┬── Phase 2 (Cl
 | Phase 5: Specialists | Complete |
 | Phase 6: Failure Handling | Complete |
 | Phase 7.1: Installer | Complete |
-| Phase 7.2: Cross-tool Testing | Pending (requires runtime testing) |
-| Phase 7.3: Documentation | Mostly complete (project README pending) |
+| Phase 7.2: Cross-tool Testing | Deferred (future OpenSpec change) |
+| Phase 7.3: Documentation | Complete |
