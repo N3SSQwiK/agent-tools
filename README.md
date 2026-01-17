@@ -36,10 +36,15 @@ The installer provides an interactive TUI for selecting tools and features.
 ```
 agent-tools/
 ├── features/                    # Feature modules
-│   └── continuity/              # Session continuity feature
-│       ├── claude/              # Claude Code files
-│       ├── gemini/              # Gemini CLI files
-│       └── codex/               # Codex CLI files
+│   ├── continuity/              # Session continuity feature
+│   │   ├── claude/              # Claude Code files
+│   │   ├── gemini/              # Gemini CLI files
+│   │   └── codex/               # Codex CLI files
+│   └── maestro/                 # Multi-agent orchestration
+│       ├── claude/              # Claude Code commands
+│       ├── gemini/              # Gemini CLI extensions
+│       ├── codex/               # Codex CLI prompts
+│       └── docs/                # Maestro documentation
 ├── installer/                   # Interactive TUI installers
 │   ├── go/                      # Go + Bubbletea version
 │   └── python/                  # Python + Textual version
@@ -49,14 +54,6 @@ agent-tools/
 │   └── CODEX-COMMANDS.md
 └── install*.sh                  # Install scripts
 ```
-
-## Supported Tools
-
-| Tool | Config Location | Commands |
-|------|-----------------|----------|
-| Claude Code | `~/.claude/` | `/continuity` |
-| Gemini CLI | `~/.gemini/` | `/continuity` |
-| Codex CLI | `~/.codex/` | `/prompts:continuity` |
 
 ## Features
 
@@ -101,6 +98,32 @@ Session continuity tracking across projects with seamless tool switching.
 ```
 
 **Migration:** Tools automatically detect legacy files (`.claude/CONTINUITY.md`, `.gemini/CONTINUITY.md`, `.codex/CONTINUITY.md`) and offer to migrate them to the unified location.
+
+### Maestro
+
+Multi-agent orchestration system enabling any AI tool to coordinate complex tasks across Claude Code, Gemini CLI, and Codex CLI.
+
+**Commands:**
+| Command | Purpose |
+|---------|---------|
+| `/maestro plan <goal>` | Decompose goal into atomic tasks |
+| `/maestro challenge` | Have spokes challenge the plan |
+| `/maestro run [task-id]` | Execute plan or specific task |
+| `/maestro review [task-id]` | Cross-tool review of completed work |
+| `/maestro status` | Display current orchestration state |
+| `/maestro report` | Generate execution walkthrough |
+
+**How it works:**
+1. **Plan** → Hub analyzes codebase, creates task breakdown with specialist assignments
+2. **Challenge** (optional) → Different tool challenges plan assumptions
+3. **Run** → Hub dispatches tasks to spokes, collects and validates results
+4. **Review** (optional) → Cross-tool review before accepting work
+
+**State files:**
+- `.ai/MAESTRO.md` - Orchestration state (tasks, status, dependencies)
+- `.ai/MAESTRO-LOG.md` - Execution log (opt-in with `--log=summary`)
+
+**Documentation:** See [features/maestro/docs/](features/maestro/docs/) for the full user guide, spoke contract, and troubleshooting.
 
 ## Adding Features
 

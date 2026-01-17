@@ -162,6 +162,16 @@ Return result as markdown with Status, Summary, Changes, Verification, Issues se
 codex exec "<handoff prompt>" --full-auto --json
 ```
 
+**Structured Output:**
+```bash
+codex exec "<handoff prompt>" --full-auto --output-schema ./result-schema.json
+```
+
+**Full Access (trusted environments only):**
+```bash
+codex exec "<handoff prompt>" --full-auto --json --sandbox danger-full-access
+```
+
 **Note:** Codex operates in full-auto mode, suitable for well-defined atomic tasks.
 
 **Example:**
@@ -184,7 +194,37 @@ Return result as markdown with Status, Summary, Changes, Verification, Issues se
 
 ### Claude Code
 
-Claude Code runs in interactive mode. When acting as spoke, it receives the handoff through the state file or direct prompt.
+```bash
+claude -p "<handoff prompt>" --output-format json
+```
+
+**Full Automation (trusted environments only):**
+```bash
+claude -p "<handoff prompt>" --output-format json --dangerously-skip-permissions
+```
+
+**Useful flags:**
+- `--max-turns N` - Limit agentic turns
+- `--max-budget-usd N` - Set cost ceiling
+- `--no-session-persistence` - Stateless execution
+
+**Example:**
+```bash
+claude -p "## Task
+Review authentication implementation for security issues
+
+## Context
+Implementation at src/auth/jwt.ts
+Session handling in src/auth/session.ts
+
+## Success Criteria
+- [ ] No hardcoded secrets
+- [ ] Token expiration handled
+- [ ] Input validation present
+
+## Output Format
+Return result as markdown with Status, Summary, Changes, Verification, Issues sections" --output-format json
+```
 
 ## Precondition Checks (AAVSR)
 
@@ -218,15 +258,19 @@ When task fails, hub escalates through:
 3. **Task Decomposition** - Break into smaller subtasks
 4. **User Escalation** - Request human intervention
 
-## Token Budgets
+## Cost Management
 
-| Tool | Budget | Abort Threshold |
-|------|--------|-----------------|
-| Gemini CLI | 30,000 tokens | 50,000 tokens |
-| Codex CLI | 40,000 tokens | 60,000 tokens |
+**User Responsibility:** Token and cost management is the user's responsibility. Each CLI tool has its own billing model (subscription or API-based), and users should configure limits appropriate to their setup.
 
-- **Over budget:** Hub logs warning, investigates
-- **Over abort threshold:** Hub aborts delegation, handles directly
+**Available Controls:**
+- **Claude Code:** `--max-turns N`, `--max-budget-usd N`
+- **Gemini CLI:** Managed via Google Cloud billing
+- **Codex CLI:** Managed via OpenAI billing settings
+
+**Guidance for Complex Tasks:**
+- Start with smaller tasks to calibrate cost expectations
+- Use `/maestro plan` with `--log=summary` to track token usage patterns
+- Review `.ai/MAESTRO-LOG.md` after orchestration to inform future budgeting
 
 ## Timeout Handling (Exit 124)
 

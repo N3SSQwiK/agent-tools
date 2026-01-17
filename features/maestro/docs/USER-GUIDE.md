@@ -4,10 +4,10 @@
 
 Before using Maestro, ensure you have:
 
-1. **Authenticated CLI tools** - Each tool you want to use as a spoke must be configured
-   - Claude Code: Anthropic API key
-   - Gemini CLI: Google account
-   - Codex CLI: OpenAI API key
+1. **Authenticated CLI tools** - Each tool you want to use as a spoke must be configured (OAuth or API key)
+   - Claude Code: Anthropic account or API key
+   - Gemini CLI: Google account or API key
+   - Codex CLI: OpenAI account or API key
 
 2. **Project context** - Maestro works best when run from a project root
 
@@ -212,11 +212,15 @@ Maestro is designed for token efficiency:
 - **Pre-delegation recon**: Cheap checks before expensive dispatches
 - **Gemini @path syntax**: 9.2x more efficient than inline content
 
-### Token Budgets
+### Cost Management
 
-| Tool | Budget | Abort Threshold |
-|------|--------|-----------------|
-| Gemini CLI | 30,000 | 50,000 |
-| Codex CLI | 40,000 | 60,000 |
+Token and cost management is your responsibility. Each CLI tool has its own billing model:
 
-If a spoke exceeds the abort threshold, the hub handles the task directly.
+- **Claude Code:** Subscription or API billing; use `--max-turns` and `--max-budget-usd` flags
+- **Gemini CLI:** Google Cloud billing
+- **Codex CLI:** OpenAI billing
+
+**Tips:**
+- Start with smaller orchestrations to calibrate cost expectations
+- Enable `--log=summary` to track token usage patterns
+- Review `.ai/MAESTRO-LOG.md` after orchestration to inform future planning

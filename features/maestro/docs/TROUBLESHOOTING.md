@@ -177,6 +177,6 @@ If issues persist:
 1. Generate a report: `/maestro report`
 2. Review the execution log for patterns
 3. Check tool-specific documentation:
-   - [Gemini CLI docs](https://cloud.google.com/sdk/gcloud/reference/alpha/gemini)
-   - [Codex CLI docs](https://platform.openai.com/docs/guides/code)
-   - [Claude Code docs](https://docs.anthropic.com/claude/code)
+   - [Claude Code docs](https://code.claude.com/docs/en/cli-reference)
+   - [Gemini CLI docs](https://geminicli.com/docs/cli/headless/#configuration-options)
+   - [Codex CLI docs](https://developers.openai.com/codex/noninteractive/)
