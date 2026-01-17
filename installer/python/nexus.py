@@ -451,11 +451,11 @@ class InstallingScreen(Screen):
         repo = self.app.repo_path
 
         # Get selected features
-        selected_features = [f.directory for f in FEATURES if f.selected]
+        selected_features = [f.id for f in FEATURES if f.selected]
 
         # Write managed configs once per tool (rebuild from all selected features)
         # Only write if tool directory exists (indicates tool is installed and has been run)
-        selected_tools = [t.name for t in TOOLS if t.selected]
+        selected_tools = [t.id for t in TOOLS if t.selected]
         if "claude" in selected_tools:
             claude_dir = home / ".claude"
             if claude_dir.exists():
