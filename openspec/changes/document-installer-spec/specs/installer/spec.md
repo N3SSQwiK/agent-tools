@@ -100,6 +100,12 @@ The installer MUST rebuild the managed block from all selected features on each 
 - **When** running the installer
 - **Then** no managed block is written for that tool
 
+#### Scenario: Tool directory does not exist
+- **Given** the tool's config directory (e.g., `~/.claude`) does not exist
+- **When** running the installer with that tool selected
+- **Then** the installer skips the config write for that tool
+- **And** notifies the user to install and run the CLI tool first
+
 ### Requirement: Claude Code Installation
 The installer MUST install Claude Code features using symlinks.
 
