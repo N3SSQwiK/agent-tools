@@ -34,6 +34,40 @@ The system SHALL provide interactive logging level selection during plan approva
 - **WHEN** user dismisses or skips the logging menu
 - **THEN** the hub defaults to no logging (current behavior preserved)
 
+### Requirement: Structured User Decision Menus
+The system SHALL present all user decision points as structured numbered menus for UX consistency.
+
+#### Scenario: Plan approval menu
+- **WHEN** hub presents a plan for user approval
+- **THEN** the hub displays a numbered menu with options: Approve, Modify, Reject
+
+#### Scenario: Challenge response menu
+- **WHEN** hub presents challenge feedback to user
+- **THEN** the hub displays a numbered menu with options: Revise, Proceed, Reject, Other
+
+#### Scenario: Review response menu
+- **WHEN** hub presents review feedback to user
+- **THEN** the hub displays a numbered menu with options: Accept, Revise, Flag, Other
+
+#### Scenario: Menu format consistency
+- **WHEN** any decision menu is presented
+- **THEN** each option SHALL include a short description of its effect
+
+#### Scenario: Other option behavior
+- **WHEN** user selects "Other" from a menu that includes it
+- **THEN** the hub accepts free-text input for custom responses
+
+### Requirement: Spoke Guardrails
+The system SHALL include guardrails in task handoff prompts to constrain spoke behavior.
+
+#### Scenario: Guardrails in handoff
+- **WHEN** hub builds a task handoff for a spoke
+- **THEN** the handoff SHALL include a Guardrails section with strict rules
+
+#### Scenario: Guardrail content
+- **WHEN** guardrails are included in handoff
+- **THEN** they SHALL prohibit: modifying unlisted files, running exploratory commands, installing dependencies without request, expanding scope, and improvising when blocked
+
 ## MODIFIED Requirements
 
 ### Requirement: Run Command
