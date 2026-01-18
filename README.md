@@ -115,13 +115,17 @@ Multi-agent orchestration system enabling any AI tool to coordinate complex task
 
 **How it works:**
 1. **Plan** → Hub analyzes codebase, creates task breakdown with specialist assignments
-2. **Challenge** (optional) → Different tool challenges plan assumptions
-3. **Run** → Hub dispatches tasks to spokes, collects and validates results
-4. **Review** (optional) → Cross-tool review before accepting work
+2. **Approve** → Select from structured menu (Approve/Modify/Reject)
+3. **Logging** → Choose logging level (None/Summary/Detailed) via interactive menu
+4. **Challenge** (optional) → Different tool challenges plan assumptions
+5. **Run** → Hub dispatches tasks to spokes with guardrails, collects and validates results
+6. **Review** (optional) → Cross-tool review before accepting work
+
+**Interactive menus:** All decision points use structured numbered menus for consistency. Select options by number or choose "Other" for custom responses.
 
 **State files:**
 - `.ai/MAESTRO.md` - Orchestration state (tasks, status, dependencies)
-- `.ai/MAESTRO-LOG.md` - Execution log (opt-in with `--log=summary`)
+- `.ai/MAESTRO-LOG.md` - Execution log (opt-in via menu or `--log=summary`)
 
 **Documentation:** See [features/maestro/docs/](features/maestro/docs/) for the full user guide, spoke contract, and troubleshooting.
 

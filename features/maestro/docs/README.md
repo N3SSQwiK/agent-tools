@@ -16,11 +16,49 @@ Decompose a goal into atomic tasks:
 
 This will:
 - Analyze your codebase
-- Create a task breakdown
-- Assign specialists and tools
-- Present for your approval
+- Create a task breakdown with specialists and tools
+- Present a structured approval menu:
+  ```
+  Ready to proceed with this plan?
 
-### 2. Run
+  1. Approve — Accept the plan and continue
+  2. Modify — Adjust tasks, tools, or dependencies
+  3. Reject — Discard this plan and start over
+  ```
+
+### 2. Select Logging Level
+
+After approving the plan, you'll be prompted to select a logging level:
+
+```
+Select logging level for this orchestration:
+
+1. None (default) — No execution log created
+2. Summary — Log actions, outcomes, token counts to .ai/MAESTRO-LOG.md
+3. Detailed — Log full prompts and outputs (useful for debugging)
+```
+
+You can skip this by passing `--log=summary` or `--log=detailed` with the plan command.
+
+### 3. Challenge (Optional)
+
+Have a different AI tool challenge the plan:
+
+```
+/maestro challenge
+```
+
+Review feedback and choose:
+```
+How would you like to proceed?
+
+1. Revise — Incorporate feedback and update the plan
+2. Proceed — Continue with current plan despite concerns
+3. Reject — Discard this plan and start over
+4. Other — Type a different response
+```
+
+### 4. Run
 
 Execute the approved plan:
 
@@ -34,12 +72,26 @@ Or run a specific task:
 /maestro run 3
 ```
 
-### 3. Monitor
+### 5. Review (Optional)
+
+Have another tool review completed work:
+
+```
+/maestro review
+```
+
+### 6. Monitor
 
 Check orchestration status:
 
 ```
 /maestro status
+```
+
+Generate an execution report (requires logging):
+
+```
+/maestro report
 ```
 
 ## Commands
@@ -74,15 +126,42 @@ Check orchestration status:
 - `.ai/MAESTRO.md` - Orchestration state (tasks, status)
 - `.ai/MAESTRO-LOG.md` - Execution log (opt-in)
 
-## Execution Logging
+## User Interaction
 
-Enable logging to track token usage and debug issues:
+All decision points use structured numbered menus for consistency:
 
-```
-/maestro plan "goal" --log=summary
-/maestro run --log=detailed
-/maestro report
-```
+| Decision Point | Options |
+|----------------|---------|
+| Plan approval | Approve, Modify, Reject |
+| Logging level | None, Summary, Detailed |
+| Challenge response | Revise, Proceed, Reject, Other |
+| Review response | Accept, Revise, Flag, Other |
+
+The "Other" option allows free-text input for custom responses.
+
+## Spoke Guardrails
+
+When tasks are dispatched to spokes, they include strict guardrails:
+
+1. **ONLY modify files explicitly listed**
+2. **ONLY run commands required for THIS task**
+3. **DO NOT install dependencies** unless explicitly requested
+4. **DO NOT expand scope**
+5. **STOP if blocked** — report blockers instead of improvising
+
+These guardrails prevent scope creep and ensure predictable execution.
+
+## CLI Dispatch Patterns
+
+The hub uses these patterns when dispatching to spokes:
+
+| Tool | Command Pattern |
+|------|-----------------|
+| Claude Code | `claude -p "..." --output-format json --dangerously-skip-permissions` |
+| Gemini CLI | `gemini -p "..." -y -o json` |
+| Codex CLI | `codex exec "..." --full-auto --json` |
+
+All flags are required for proper file write permissions.
 
 ## Documentation
 

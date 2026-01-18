@@ -107,6 +107,25 @@ When logging is enabled (`--log=summary` or `--log=detailed`), execution details
 | `summary` | Updated | Actions + outcomes | Cost tracking |
 | `detailed` | Updated | Full prompts/outputs | Debugging |
 
+### Setting Logging Level
+
+Logging level can be set two ways:
+
+1. **Interactive menu** (recommended) — After plan approval, select from:
+   ```
+   Select logging level for this orchestration:
+
+   1. None (default) — No execution log created
+   2. Summary — Log actions, outcomes, token counts to .ai/MAESTRO-LOG.md
+   3. Detailed — Log full prompts and outputs (useful for debugging)
+   ```
+
+2. **Command flag** — Pass `--log=summary` or `--log=detailed` with the plan command:
+   ```
+   /maestro plan "goal" --log=summary
+   ```
+   This skips the interactive menu.
+
 ## Lifecycle
 
 1. **Created:** When `/maestro plan` is approved by user

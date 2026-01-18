@@ -2,6 +2,30 @@
 
 ## Common Issues
 
+### Spoke Cannot Write Files (Permission Denied)
+
+**Symptom**: Spoke reports permission denied or `permission_denials` in output.
+
+**Causes**:
+1. Missing auto-approve flags in dispatch command
+2. Tool not running in the correct mode
+
+**Solutions**:
+
+Verify the hub is using correct dispatch patterns:
+
+| Tool | Required Command |
+|------|------------------|
+| Claude Code | `claude -p "..." --output-format json --dangerously-skip-permissions` |
+| Gemini CLI | `gemini -p "..." -y -o json` |
+| Codex CLI | `codex exec "..." --full-auto --json` |
+
+**Note**: The `--dangerously-skip-permissions` flag for Claude Code is required for file writes. The `-y` flag enables Gemini's "YOLO mode" for auto-approving tool calls.
+
+**Recovery**: If a spoke returns `permission_denials`, the hub may extract file paths and content to write files directly as a fallback.
+
+---
+
 ### "No active Maestro orchestration"
 
 **Symptom**: Running `/maestro status` or `/maestro run` reports no active orchestration.
@@ -67,7 +91,24 @@
 **Solutions**:
 1. Add clearer output format instructions to task
 2. Make success criteria more explicit
-3. Add stricter constraints to task handoff
+3. Guardrails are automatically included in handoffs to prevent scope creep
+
+---
+
+### Spoke Ignores Guardrails
+
+**Symptom**: Spoke modifies files not listed in the task or runs exploratory commands.
+
+**Cause**: Global instructions in the spoke's configuration (e.g., `~/.claude/CLAUDE.md`) may conflict with Maestro guardrails.
+
+**Example**: A global instruction to "check for `.ai/CONTINUITY.md`" causes the spoke to run extra commands even though guardrails say "ONLY run commands required for THIS task."
+
+**Solutions**:
+1. Review global instructions for conflicts with Maestro guardrails
+2. Consider removing or scoping global instructions that cause exploration
+3. Accept that some overhead is unavoidable due to inherited configuration
+
+**Note**: Spokes acknowledge guardrail conflicts in their reasoning (e.g., "Checking continuity file despite guardrails"). This is a known limitation when global and task-specific instructions conflict.
 
 ---
 
@@ -170,6 +211,31 @@ Preview execution without dispatching:
 
 ---
 
+## Token Usage Higher Than Expected
+
+**Symptom**: Simple tasks use many more tokens than expected.
+
+**Causes**:
+1. **Cached vs. new tokens**: Total tokens include cached tokens, but only new tokens cost full price for API users
+2. **Multi-model routing**: Some tools use multiple models (e.g., Gemini uses a lite model for routing + main model for execution)
+3. **Global instructions**: Inherited configuration adds to context size
+4. **Exploratory commands**: Spokes may run commands like `ls` or `cat` that weren't strictly necessary
+
+**Understanding token counts**:
+```
+Total input: 21,114
+Cached: 16,896 (80%)
+New: 4,218       ← API users pay reduced rate for cached
+Output: 445
+
+API cost: ~4,663 tokens equivalent
+Subscription impact: 21,559 tokens against quota  ← Subscription users pay full quota
+```
+
+**Key insight**: Caching benefits API billing but not subscription quotas. Subscription users should monitor total tokens.
+
+---
+
 ## Getting Help
 
 If issues persist:
@@ -177,6 +243,6 @@ If issues persist:
 1. Generate a report: `/maestro report`
 2. Review the execution log for patterns
 3. Check tool-specific documentation:
-   - [Claude Code docs](https://code.claude.com/docs/en/cli-reference)
-   - [Gemini CLI docs](https://geminicli.com/docs/cli/headless/#configuration-options)
-   - [Codex CLI docs](https://developers.openai.com/codex/noninteractive/)
+   - [Claude Code docs](https://docs.anthropic.com/en/docs/claude-code)
+   - [Gemini CLI docs](https://github.com/google-gemini/gemini-cli)
+   - [Codex CLI docs](https://github.com/openai/codex)
