@@ -121,6 +121,15 @@ Claude Code | 2026-01-16 14:30 UTC
 3. **Assignment**: Each task gets a specialist and tool
 4. **Validation**: Tasks are checked against AAVSR criteria
 5. **Approval**: Plan is presented for your review
+6. **Logging Selection**: If approved, you're prompted to select a logging level:
+   ```
+   Select logging level for this orchestration:
+
+   1. None (default) — No execution log created
+   2. Summary — Log actions, outcomes, token counts to .ai/MAESTRO-LOG.md
+   3. Detailed — Log full prompts and outputs (useful for debugging)
+   ```
+   **Note:** This step is skipped if you passed `--log=summary` or `--log=detailed` with the command.
 
 ### AAVSR Criteria
 
@@ -209,6 +218,7 @@ For each runnable task (status=`pending`, dependencies satisfied):
 │     - Gemini: gemini -p "<prompt>" -y -o json                       │
 │     - Codex: codex exec "<prompt>" --full-auto --json               │
 │     - Claude: claude -p "<prompt>" --output-format json             │
+│               --dangerously-skip-permissions                        │
 └──────────────────────────────┬──────────────────────────────────────┘
                                ▼
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -243,8 +253,20 @@ When dispatching to a spoke, the hub sends:
 ## Constraints
 - [Scope boundary - what NOT to do]
 
+## Guardrails
+
+> **🚨 STRICT RULES — VIOLATIONS WILL CAUSE TASK REJECTION**
+>
+> 1. **ONLY modify files explicitly listed** — Do not touch any other files
+> 2. **ONLY run commands required for THIS task** — No exploratory commands
+> 3. **DO NOT install dependencies** unless explicitly requested
+> 4. **DO NOT expand scope** — If additional work is needed, report it in Issues
+> 5. **STOP if blocked** — Do not improvise solutions; report blockers instead
+
 ## Output Format
 Return result as markdown with Status, Summary, Changes, Verification, Issues sections.
+
+**You MUST use this exact format. Non-compliant responses will be rejected.**
 ```
 
 ### Quality Gates

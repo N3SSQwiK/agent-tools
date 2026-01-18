@@ -34,10 +34,15 @@ After `/maestro plan`, before user approval or `/maestro run`.
    - Scope concerns
    - Alternative approaches
 
-6. Present challenges to user with options:
-   - Revise plan based on feedback
-   - Proceed despite concerns
-   - Reject plan and start over
+6. Present challenges to user with response menu:
+   ```
+   How would you like to proceed?
+
+   1. Revise — Incorporate feedback and update the plan
+   2. Proceed — Continue with current plan despite concerns
+   3. Reject — Discard this plan and start over
+   4. Other — Type a different response
+   ```
 
 7. If user chooses to revise, update `.ai/MAESTRO.md`
 

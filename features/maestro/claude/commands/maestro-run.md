@@ -43,8 +43,20 @@ Send to spoke:
 ## Constraints
 - [Scope boundary]
 
+## Guardrails
+
+> **🚨 STRICT RULES — VIOLATIONS WILL CAUSE TASK REJECTION**
+>
+> 1. **ONLY modify files explicitly listed** — Do not touch any other files
+> 2. **ONLY run commands required for THIS task** — No exploratory commands
+> 3. **DO NOT install dependencies** unless explicitly requested
+> 4. **DO NOT expand scope** — If additional work is needed, report it in Issues
+> 5. **STOP if blocked** — Do not improvise solutions; report blockers instead
+
 ## Output Format
 Return result as markdown with Status, Summary, Changes, Verification, Issues sections.
+
+**You MUST use this exact format. Non-compliant responses will be rejected.**
 ```
 
 ## Result Validation
@@ -57,22 +69,56 @@ Parse spoke result and validate:
 
 ## CLI Dispatch Patterns
 
+> **🚨 CRITICAL DISPATCH RULES — READ BEFORE EVERY DISPATCH**
+>
+> 1. **COPY THE EXACT COMMAND** — Do not modify, abbreviate, or omit any flags
+> 2. **VERIFY ALL FLAGS** — Before executing, confirm your command matches the pattern
+> 3. **FAILURE CONSEQUENCE** — Missing flags WILL cause spoke file write failures
+
 ### Gemini CLI
+
+**EXACT COMMAND (do not modify):**
 ```bash
 gemini -p "<handoff prompt>" -y -o json
 ```
+
+**Pre-dispatch checklist:**
+- [ ] Command starts with `gemini -p`
+- [ ] Has `-y` flag (enables YOLO mode for file writes)
+- [ ] Has `-o json` flag (structured output)
+- [ ] Prompt is properly quoted
+
 Use `@path/to/file` for file references (9.2x token efficiency).
 
 ### Codex CLI
+
+**EXACT COMMAND (do not modify):**
 ```bash
 codex exec "<handoff prompt>" --full-auto --json
 ```
 
+**Pre-dispatch checklist:**
+- [ ] Command starts with `codex exec`
+- [ ] Has `--full-auto` flag (enables autonomous file writes)
+- [ ] Has `--json` flag (structured output)
+
 ### Claude Code
+
+**EXACT COMMAND (do not modify):**
 ```bash
-claude -p "<handoff prompt>" --output-format json
+claude -p "<handoff prompt>" --output-format json --dangerously-skip-permissions
 ```
-Use `--max-turns N` to limit agentic turns, `--dangerously-skip-permissions` for full automation in trusted environments.
+
+**Pre-dispatch checklist:**
+- [ ] Command starts with `claude -p`
+- [ ] Has `--output-format json` flag
+- [ ] Has `--dangerously-skip-permissions` flag (enables file writes)
+
+**Security Note:** The `--dangerously-skip-permissions` flag grants broad file access to the sub-agent. This is appropriate for Maestro orchestration where tasks are pre-approved during planning. Use `--max-turns N` to limit agentic turns if needed.
+
+### Permission Recovery
+
+If a spoke returns a `permission_denials` response (e.g., Claude Code without the permissions flag), the hub MAY extract the file paths and content from the response and write files directly as a fallback.
 
 ## Precondition Checks (AAVSR)
 

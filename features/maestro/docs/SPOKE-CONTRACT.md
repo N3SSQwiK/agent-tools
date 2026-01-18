@@ -30,8 +30,20 @@ Hub sends this format when delegating work to a spoke:
 - [Scope boundary 1]
 - [Scope boundary 2]
 
+## Guardrails
+
+> **🚨 STRICT RULES — VIOLATIONS WILL CAUSE TASK REJECTION**
+>
+> 1. **ONLY modify files explicitly listed** — Do not touch any other files
+> 2. **ONLY run commands required for THIS task** — No exploratory commands
+> 3. **DO NOT install dependencies** unless explicitly requested
+> 4. **DO NOT expand scope** — If additional work is needed, report it in Issues
+> 5. **STOP if blocked** — Do not improvise solutions; report blockers instead
+
 ## Output Format
 [Expected structure of result]
+
+**You MUST use this exact format. Non-compliant responses will be rejected.**
 ```
 
 ### Field Requirements
@@ -131,11 +143,22 @@ Spoke returns this format after completing (or failing) a task:
 
 ## Tool-Specific Invocation
 
+> **🚨 CRITICAL DISPATCH RULES — READ BEFORE EVERY DISPATCH**
+>
+> 1. **COPY THE EXACT COMMAND** — Do not modify, abbreviate, or omit any flags
+> 2. **VERIFY ALL FLAGS** — Before executing, confirm your command matches the pattern
+> 3. **FAILURE CONSEQUENCE** — Missing flags WILL cause spoke file write failures
+
 ### Gemini CLI
 
+**EXACT COMMAND (do not modify):**
 ```bash
 gemini -p "<handoff prompt>" -y -o json
 ```
+
+**Pre-dispatch checklist:**
+- [ ] Has `-y` flag (enables YOLO mode for file writes)
+- [ ] Has `-o json` flag (structured output)
 
 **Token Efficiency:** Use `@path/to/file` for file references (9.2x more efficient than inline content).
 
@@ -158,17 +181,18 @@ Return result as markdown with Status, Summary, Changes, Verification, Issues se
 
 ### Codex CLI
 
+**EXACT COMMAND (do not modify):**
 ```bash
 codex exec "<handoff prompt>" --full-auto --json
 ```
 
-**Structured Output:**
+**Pre-dispatch checklist:**
+- [ ] Has `--full-auto` flag (enables autonomous file writes)
+- [ ] Has `--json` flag (structured output)
+
+**Additional options:**
 ```bash
 codex exec "<handoff prompt>" --full-auto --output-schema ./result-schema.json
-```
-
-**Full Access (trusted environments only):**
-```bash
 codex exec "<handoff prompt>" --full-auto --json --sandbox danger-full-access
 ```
 
@@ -194,16 +218,18 @@ Return result as markdown with Status, Summary, Changes, Verification, Issues se
 
 ### Claude Code
 
-```bash
-claude -p "<handoff prompt>" --output-format json
-```
-
-**Full Automation (trusted environments only):**
+**EXACT COMMAND (do not modify):**
 ```bash
 claude -p "<handoff prompt>" --output-format json --dangerously-skip-permissions
 ```
 
-**Useful flags:**
+**Pre-dispatch checklist:**
+- [ ] Has `--output-format json` flag
+- [ ] Has `--dangerously-skip-permissions` flag (enables file writes)
+
+**Security Note:** The `--dangerously-skip-permissions` flag grants broad file access. This is appropriate for Maestro orchestration where tasks are pre-approved during planning.
+
+**Additional options:**
 - `--max-turns N` - Limit agentic turns
 - `--max-budget-usd N` - Set cost ceiling
 - `--no-session-persistence` - Stateless execution
@@ -223,8 +249,12 @@ Session handling in src/auth/session.ts
 - [ ] Input validation present
 
 ## Output Format
-Return result as markdown with Status, Summary, Changes, Verification, Issues sections" --output-format json
+Return result as markdown with Status, Summary, Changes, Verification, Issues sections" --output-format json --dangerously-skip-permissions
 ```
+
+### Permission Recovery
+
+If a spoke returns a `permission_denials` response (e.g., Claude Code without the permissions flag), the hub MAY extract the file paths and content from the response and write files directly as a fallback.
 
 ## Precondition Checks (AAVSR)
 

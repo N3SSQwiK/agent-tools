@@ -36,10 +36,15 @@ Can be invoked:
 
 5. Collect review feedback
 
-6. Present review to user with options:
-   - Accept result as-is
-   - Request revision from original spoke
-   - Flag issues for manual resolution
+6. Present review to user with response menu:
+   ```
+   How would you like to proceed?
+
+   1. Accept — Approve the work as-is
+   2. Revise — Request changes from original spoke
+   3. Flag — Escalate for manual resolution
+   4. Other — Type a different response
+   ```
 
 7. Update state based on user decision
 
@@ -103,11 +108,16 @@ Display to user:
 - [Recommendation 1]
 - [Recommendation 2]
 
----
-**Options:**
-1. Accept work as-is
-2. Request revision from [original tool]
-3. Flag for manual resolution
+```
+
+Then present the response menu:
+```
+How would you like to proceed?
+
+1. Accept — Approve the work as-is
+2. Revise — Request changes from original spoke
+3. Flag — Escalate for manual resolution
+4. Other — Type a different response
 ```
 
 ## Verdict Values

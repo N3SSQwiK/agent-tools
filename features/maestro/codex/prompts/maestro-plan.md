@@ -28,11 +28,27 @@ Decompose a high-level goal into atomic tasks for multi-agent orchestration.
 
 5. Present plan to user for approval:
    - Show goal, tasks, assignments
-   - Ask: "Approve plan? (yes/no/modify)"
+   - Present approval menu:
+   ```
+   Ready to proceed with this plan?
 
-6. If approved, write to `.ai/MAESTRO.md`
+   1. Approve — Accept the plan and continue
+   2. Modify — Adjust tasks, tools, or dependencies
+   3. Reject — Discard this plan and start over
+   ```
 
-7. If logging enabled (`--log=summary` or `--log=detailed`), initialize `.ai/MAESTRO-LOG.md`
+6. If approved, prompt for logging level (unless `--log` flag was provided):
+   ```
+   Select logging level for this orchestration:
+
+   1. None (default) — No execution log created
+   2. Summary — Log actions, outcomes, token counts to .ai/MAESTRO-LOG.md
+   3. Detailed — Log full prompts and outputs (useful for debugging)
+   ```
+
+7. Write plan to `.ai/MAESTRO.md`
+
+8. If logging enabled (via menu selection or `--log` flag), initialize `.ai/MAESTRO-LOG.md`
 
 ## Precondition Checks (AAVSR)
 
@@ -73,7 +89,17 @@ Codex CLI | [YYYY-MM-DD HH:MM UTC]
 - Use UTC timezone for timestamps
 - Hub tool name is "Codex CLI"
 
-## Flags
+## Logging Configuration
 
-- `--log=summary`: Log actions and outcomes to `.ai/MAESTRO-LOG.md`
-- `--log=detailed`: Log full prompts and outputs
+Logging level can be set two ways:
+
+1. **Interactive selection** (recommended) — After plan approval, user selects from menu
+2. **Flag** — Pass `--log=summary` or `--log=detailed` with the command
+
+| Method | Behavior |
+|--------|----------|
+| Menu: "None" or no flag | No logging |
+| Menu: "Summary" or `--log=summary` | Create `.ai/MAESTRO-LOG.md`, log actions and outcomes |
+| Menu: "Detailed" or `--log=detailed` | Log full prompts and outputs |
+
+**Note:** If `--log` flag is provided, skip the interactive menu.
