@@ -507,7 +507,35 @@ Claude's error response includes the **exact content** it wanted to write. The h
 
 ---
 
+## Resolution Status ✅
+
+**All issues identified in this assessment have been resolved.**
+
+### Changes Applied (2026-01-17)
+
+| Issue | Resolution | Change |
+|-------|------------|--------|
+| Claude Code missing `--dangerously-skip-permissions` | ✅ Fixed | Added to dispatch pattern in all command files |
+| Gemini CLI missing `-y -o json` (execution bug) | ✅ Fixed | Added CRITICAL DISPATCH RULES callouts with pre-dispatch checklists |
+| Spoke scope creep | ✅ Mitigated | Added Guardrails section to Task Handoff Template |
+| Logging flag discoverability | ✅ Improved | Added interactive logging selection menu |
+| UX inconsistency | ✅ Improved | Standardized all decision points to structured menus |
+
+### Validation
+
+Fixes were validated in `docs/maestro-testing-2/`:
+- **Test 1** (hello.sh): Claude Code spoke — ✅ Success, no permission errors
+- **Test 2** (config + README): Gemini + Codex spokes — ✅ Success, all flags present
+
+### Reference
+
+- OpenSpec change: `fix-maestro-dispatch-patterns`
+- Validation documentation: `docs/maestro-testing-2/ASSESSMENT.md`
+
+---
+
 *Assessment conducted: 2026-01-17*
 *Test project: task-tracker CLI*
 *Assessor: Claude Code (Opus 4.5)*
 *Post-assessment testing: Confirmed Gemini works, Claude Code is the only issue*
+*Resolution applied: 2026-01-17 via fix-maestro-dispatch-patterns*
