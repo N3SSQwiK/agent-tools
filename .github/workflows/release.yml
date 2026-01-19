@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+
+      - name: Get release info
+        id: release
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+          # Wait for GitHub to generate the tarball
+          sleep 5
+
+          # Download and compute SHA256
+          TARBALL_URL="https://github.com/${{ github.repository }}/archive/refs/tags/${VERSION}.tar.gz"
+          echo "Downloading tarball from: ${TARBALL_URL}"
+          curl -sL "$TARBALL_URL" -o release.tar.gz
+
+          SHA256=$(shasum -a 256 release.tar.gz | cut -d' ' -f1)
+          echo "sha256=${SHA256}" >> $GITHUB_OUTPUT
+
+          echo "Version: ${VERSION}"
+          echo "SHA256: ${SHA256}"
+
+      - name: Update Homebrew tap
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.TAP_UPDATE_TOKEN }}
+          repository: N3SSQwiK/homebrew-nexus-ai
+          event-type: update-formula
+          client-payload: '{"version": "${{ steps.release.outputs.version }}", "sha256": "${{ steps.release.outputs.sha256 }}"}'
