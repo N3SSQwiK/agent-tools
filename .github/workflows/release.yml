@@ -24,19 +24,24 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/}
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
-          # Wait for GitHub to generate the tarball
-          sleep 5
-
-          # Download and compute SHA256
           TARBALL_URL="https://github.com/${{ github.repository }}/archive/refs/tags/${VERSION}.tar.gz"
-          echo "Downloading tarball from: ${TARBALL_URL}"
-          curl -sL "$TARBALL_URL" -o release.tar.gz
 
-          SHA256=$(shasum -a 256 release.tar.gz | cut -d' ' -f1)
-          echo "sha256=${SHA256}" >> $GITHUB_OUTPUT
+          # Retry with exponential backoff (GitHub CDN may not have tarball immediately)
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i: Downloading tarball from ${TARBALL_URL}..."
+            if curl -sfL "$TARBALL_URL" -o release.tar.gz; then
+              SHA256=$(shasum -a 256 release.tar.gz | cut -d' ' -f1)
+              echo "sha256=${SHA256}" >> $GITHUB_OUTPUT
+              echo "Version: ${VERSION}"
+              echo "SHA256: ${SHA256}"
+              exit 0
+            fi
+            echo "Download failed, retrying in $((i * 5)) seconds..."
+            sleep $((i * 5))
+          done
 
-          echo "Version: ${VERSION}"
-          echo "SHA256: ${SHA256}"
+          echo "Failed to download tarball after 5 attempts"
+          exit 1
 
       - name: Update Homebrew tap
         uses: peter-evans/repository-dispatch@v3

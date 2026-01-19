@@ -7,7 +7,6 @@ Fraternal colors: Red, White, Navy Blue, Gold
 import asyncio
 import os
 import json
-import sys
 from pathlib import Path
 from dataclasses import dataclass
 
