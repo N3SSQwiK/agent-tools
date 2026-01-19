@@ -8,3 +8,4 @@ __pycache__/
 
 # Codex continuity
 .ai/
+nexus_ai.egg-info/

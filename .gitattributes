@@ -1,0 +1,30 @@
+# Git attributes for Nexus-AI
+# Controls what gets included in release tarballs (git archive / GitHub releases)
+
+# Exclude development and internal files from release tarballs
+.ai export-ignore
+.github export-ignore
+openspec export-ignore
+docs export-ignore
+
+# Exclude dotfiles and config directories
+.agent export-ignore
+.claude export-ignore
+.gemini export-ignore
+
+# Exclude root-level markdown (except README.md - leave it unspecified so it's included)
+CLAUDE.md export-ignore
+AGENTS.md export-ignore
+
+# Exclude installer development files
+installer/python/venv export-ignore
+installer/python/README.md export-ignore
+installer/go export-ignore
+
+# Exclude legacy scripts
+install-claude.sh export-ignore
+install-gemini.sh export-ignore
+install-codex.sh export-ignore
+
+# Note: installer/python/features/** is automatically included since we're not excluding it
+# Feature files are essential for the package to work

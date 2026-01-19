@@ -7,10 +7,48 @@ Fraternal colors: Red, White, Navy Blue, Gold
 import asyncio
 import os
 import json
+import sys
 from pathlib import Path
 from dataclasses import dataclass
 
 from textual import on, work
+
+
+def get_features_path() -> Path:
+    """Get the path to features directory, works both in dev and installed."""
+    # Method 1: Try package resources (for pip/brew installs)
+    try:
+        from importlib.resources import files
+        pkg_features = files("installer.python").joinpath("features")
+        # Check if it's a real directory (not just a namespace)
+        if hasattr(pkg_features, '_path'):
+            pkg_path = Path(str(pkg_features._path))
+            if pkg_path.exists() and pkg_path.is_dir():
+                return pkg_path
+        # For newer Python, try direct path conversion
+        pkg_path = Path(str(pkg_features))
+        if pkg_path.exists() and pkg_path.is_dir():
+            return pkg_path
+    except (TypeError, FileNotFoundError, AttributeError, ModuleNotFoundError):
+        pass
+
+    # Method 2: Fall back to relative path from this file (development mode)
+    dev_features = Path(__file__).parent / "features"
+    if dev_features.exists() and dev_features.is_dir():
+        return dev_features
+
+    # Method 3: Legacy - look for features at repo root (backwards compat for install.sh)
+    repo_root = Path(__file__).parent.parent.parent
+    legacy_features = repo_root / "features"
+    if legacy_features.exists() and legacy_features.is_dir():
+        return legacy_features
+
+    raise FileNotFoundError(
+        "Could not locate features directory. "
+        "Expected at installer/python/features/ or repo root features/"
+    )
+
+
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Vertical, Center, Middle
@@ -448,7 +486,7 @@ class InstallingScreen(Screen):
     async def run_installation(self) -> None:
         items = list(self.query(ProgressItem))
         home = Path.home()
-        repo = self.app.repo_path
+        features = self.app.features_path
 
         # Get selected features
         selected_features = [f.id for f in FEATURES if f.selected]
@@ -459,21 +497,21 @@ class InstallingScreen(Screen):
         if "claude" in selected_tools:
             claude_dir = home / ".claude"
             if claude_dir.exists():
-                src_paths = [repo / "features" / f / "claude" / "CLAUDE.md" for f in selected_features]
+                src_paths = [features / f / "claude" / "CLAUDE.md" for f in selected_features]
                 write_managed_config(claude_dir / "CLAUDE.md", src_paths)
             else:
                 self.notify("Skipping Claude config - ~/.claude not found. Install Claude Code and run it once, then re-run this installer.", severity="warning")
         if "gemini" in selected_tools:
             gemini_dir = home / ".gemini"
             if gemini_dir.exists():
-                src_paths = [repo / "features" / f / "gemini" / "GEMINI.md" for f in selected_features]
+                src_paths = [features / f / "gemini" / "GEMINI.md" for f in selected_features]
                 write_managed_config(gemini_dir / "GEMINI.md", src_paths)
             else:
                 self.notify("Skipping Gemini config - ~/.gemini not found. Install Gemini CLI and run it once, then re-run this installer.", severity="warning")
         if "codex" in selected_tools:
             codex_dir = home / ".codex"
             if codex_dir.exists():
-                src_paths = [repo / "features" / f / "codex" / "AGENTS.md" for f in selected_features]
+                src_paths = [features / f / "codex" / "AGENTS.md" for f in selected_features]
                 write_managed_config(codex_dir / "AGENTS.md", src_paths)
             else:
                 self.notify("Skipping Codex config - ~/.codex not found. Install Codex CLI and run it once, then re-run this installer.", severity="warning")
@@ -490,22 +528,22 @@ class InstallingScreen(Screen):
 
     async def install_step(self, tool_id: str, feature_id: str) -> None:
         home = Path.home()
-        repo = self.app.repo_path
+        features = self.app.features_path
 
         if tool_id == "claude":
-            await self.install_claude(home, repo, feature_id)
+            await self.install_claude(home, features, feature_id)
         elif tool_id == "gemini":
-            await self.install_gemini(home, repo, feature_id)
+            await self.install_gemini(home, features, feature_id)
         elif tool_id == "codex":
-            await self.install_codex(home, repo, feature_id)
+            await self.install_codex(home, features, feature_id)
 
-    async def install_claude(self, home: Path, repo: Path, feature: str) -> None:
+    async def install_claude(self, home: Path, features: Path, feature: str) -> None:
         claude_dir = home / ".claude"
         commands_dir = claude_dir / "commands"
         commands_dir.mkdir(parents=True, exist_ok=True)
 
         # Install all command files from the feature's commands directory
-        src_commands_dir = repo / "features" / feature / "claude" / "commands"
+        src_commands_dir = features / feature / "claude" / "commands"
         if src_commands_dir.exists():
             for src_cmd in src_commands_dir.glob("*.md"):
                 dst_cmd = commands_dir / src_cmd.name
@@ -513,13 +551,13 @@ class InstallingScreen(Screen):
                     dst_cmd.unlink()
                 dst_cmd.write_text(src_cmd.read_text())
 
-    async def install_gemini(self, home: Path, repo: Path, feature: str) -> None:
+    async def install_gemini(self, home: Path, features: Path, feature: str) -> None:
         gemini_dir = home / ".gemini"
         ext_dir = gemini_dir / "extensions" / feature
         cmd_dir = ext_dir / "commands"
         cmd_dir.mkdir(parents=True, exist_ok=True)
 
-        src_ext = repo / "features" / feature / "gemini" / "extensions" / feature
+        src_ext = features / feature / "gemini" / "extensions" / feature
         (ext_dir / "gemini-extension.json").write_text((src_ext / "gemini-extension.json").read_text())
 
         # Install all command files from the feature's commands directory
@@ -531,13 +569,13 @@ class InstallingScreen(Screen):
         enablement_path = gemini_dir / "extensions" / "extension-enablement.json"
         update_enablement(enablement_path, feature)
 
-    async def install_codex(self, home: Path, repo: Path, feature: str) -> None:
+    async def install_codex(self, home: Path, features: Path, feature: str) -> None:
         codex_dir = home / ".codex"
         prompts_dir = codex_dir / "prompts"
         prompts_dir.mkdir(parents=True, exist_ok=True)
 
         # Install all prompt files from the feature's prompts directory
-        src_prompts_dir = repo / "features" / feature / "codex" / "prompts"
+        src_prompts_dir = features / feature / "codex" / "prompts"
         if src_prompts_dir.exists():
             for src_prompt in src_prompts_dir.glob("*.md"):
                 dst_prompt = prompts_dir / src_prompt.name
@@ -751,17 +789,33 @@ class NexusInstaller(App):
 
     def __init__(self) -> None:
         super().__init__()
-        self.repo_path = Path.cwd()
-        if not (self.repo_path / "features").exists():
-            for parent in self.repo_path.parents:
-                if (parent / "features").exists():
-                    self.repo_path = parent
-                    break
+        self.features_path = get_features_path()
 
     def on_mount(self) -> None:
         self.push_screen(WelcomeScreen())
 
 
-if __name__ == "__main__":
+def main():
+    """Entry point for the nexus-ai command."""
+    import argparse
+    from installer import __version__
+
+    parser = argparse.ArgumentParser(
+        prog="nexus-ai",
+        description="TUI installer for AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI)"
+    )
+    parser.add_argument(
+        "--version", "-v",
+        action="version",
+        version=f"nexus-ai {__version__}"
+    )
+    # Parse args (will exit on --help or --version)
+    parser.parse_args()
+
+    # Run the TUI
     app = NexusInstaller()
     app.run()
+
+
+if __name__ == "__main__":
+    main()
