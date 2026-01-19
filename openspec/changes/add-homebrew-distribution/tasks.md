@@ -5,97 +5,97 @@
 This phase must be completed first as all other phases depend on the new structure.
 
 ### 0.1 Move features directory
-- [ ] Move `features/` to `installer/python/features/`
-- [ ] Update any hardcoded paths in `nexus.py` that reference `features/`
-- [ ] **Verification:** `ls installer/python/features/` shows continuity, maestro, openspec directories
+- [x] Move `features/` to `installer/python/features/`
+- [x] Update any hardcoded paths in `nexus.py` that reference `features/`
+- [x] **Verification:** `ls installer/python/features/` shows continuity, maestro, openspec directories
 
 ### 0.2 Update nexus.py feature path resolution
-- [ ] Add `get_features_path()` function using `importlib.resources`
-- [ ] Update all code that references `repo / "features"` to use the new function
-- [ ] Ensure fallback to repo structure for development mode
-- [ ] **Verification:** Running `./install.sh` still works after the move
+- [x] Add `get_features_path()` function using `importlib.resources`
+- [x] Update all code that references `repo / "features"` to use the new function
+- [x] Ensure fallback to repo structure for development mode
+- [x] **Verification:** Running `./install.sh` still works after the move
 
 ### 0.3 Update install.sh
-- [ ] Update any paths that reference the old `features/` location
-- [ ] **Verification:** `./install.sh` completes successfully
+- [x] Update any paths that reference the old `features/` location
+- [x] **Verification:** `./install.sh` completes successfully
 
 ### 0.4 Add __init__.py files
-- [ ] Create `installer/__init__.py` (empty or with version)
-- [ ] Create `installer/python/__init__.py` (empty or with version)
-- [ ] **Verification:** `python -c "import installer.python"` succeeds
+- [x] Create `installer/__init__.py` (empty or with version)
+- [x] Create `installer/python/__init__.py` (empty or with version)
+- [x] **Verification:** `python -c "import installer.python"` succeeds
 
 ## Phase 1: Python Packaging
 
 ### 1.1 Create pyproject.toml
-- [ ] Create `pyproject.toml` in repo root with build-system configuration
-- [ ] Add project metadata (name, version, description, license)
-- [ ] Add dependencies (textual>=0.50.0)
-- [ ] Define `nexus-ai` entry point script
-- [ ] Configure setuptools to find packages and include package data
-- [ ] **Verification:** `pip install -e .` succeeds
+- [x] Create `pyproject.toml` in repo root with build-system configuration
+- [x] Add project metadata (name, version, description, license)
+- [x] Add dependencies (textual>=0.50.0)
+- [x] Define `nexus-ai` entry point script
+- [x] Configure setuptools to find packages and include package data
+- [x] **Verification:** `pip install -e .` succeeds
 
 ### 1.2 Add main() function
-- [ ] Ensure `nexus.py` has a `main()` function that can be called as entry point
-- [ ] Add `--help` flag support
-- [ ] Add `--version` flag support
-- [ ] **Verification:** `python -m installer.python.nexus --help` works
+- [x] Ensure `nexus.py` has a `main()` function that can be called as entry point
+- [x] Add `--help` flag support
+- [x] Add `--version` flag support
+- [x] **Verification:** `python -m installer.python.nexus --help` works
 
 ### 1.3 Test local installation
-- [ ] Run `pip install -e .` in project root
-- [ ] Verify `nexus-ai` command is available
-- [ ] Verify `nexus-ai` launches the TUI
-- [ ] Verify TUI can install features to config directories
-- [ ] **Verification:** `which nexus-ai` shows installed path; features install correctly
+- [x] Run `pip install -e .` in project root
+- [x] Verify `nexus-ai` command is available
+- [x] Verify `nexus-ai` launches the TUI
+- [x] Verify TUI can install features to config directories
+- [x] **Verification:** `which nexus-ai` shows installed path; features install correctly
 
 ## Phase 2: Tarball Configuration
 
 ### 2.1 Create .gitattributes
-- [ ] Create `.gitattributes` in repo root
-- [ ] Add export-ignore for `.ai/`
-- [ ] Add export-ignore for `.github/`
-- [ ] Add export-ignore for `openspec/`
-- [ ] Add export-ignore for `docs/`
-- [ ] Add export-ignore for `*.md` with exceptions for README.md and feature files
-- [ ] **Verification:** File exists with correct patterns
+- [x] Create `.gitattributes` in repo root
+- [x] Add export-ignore for `.ai/`
+- [x] Add export-ignore for `.github/`
+- [x] Add export-ignore for `openspec/`
+- [x] Add export-ignore for `docs/`
+- [x] Add export-ignore for `*.md` with exceptions for README.md and feature files
+- [x] **Verification:** File exists with correct patterns
 
 ### 2.2 Test tarball exclusions
-- [ ] Run `git archive --format=tar.gz HEAD -o test-release.tar.gz`
-- [ ] Extract and verify `openspec/` is NOT present
-- [ ] Extract and verify `installer/python/features/` IS present
-- [ ] Extract and verify feature `.md` files ARE present
-- [ ] Clean up test tarball
-- [ ] **Verification:** Tarball contains only essential files
+- [x] Run `git archive --format=tar.gz HEAD -o test-release.tar.gz`
+- [x] Extract and verify `openspec/` is NOT present
+- [x] Extract and verify `installer/python/features/` IS present
+- [x] Extract and verify feature `.md` files ARE present
+- [x] Clean up test tarball
+- [x] **Verification:** Tarball contains only essential files
 
 ## Phase 3: Homebrew Tap Repository
 
 ### 3.1 Create tap repository on GitHub
-- [ ] Create new GitHub repo: `N3SSQwiK/homebrew-nexus-ai`
-- [ ] Add description: "Homebrew tap for nexus-ai"
-- [ ] Initialize with README
-- [ ] **Verification:** Repo exists at `github.com/N3SSQwiK/homebrew-nexus-ai`
+- [x] Create new GitHub repo: `N3SSQwiK/homebrew-nexus-ai`
+- [x] Add description: "Homebrew tap for nexus-ai"
+- [x] Initialize with README
+- [x] **Verification:** Repo exists at `github.com/N3SSQwiK/homebrew-nexus-ai`
 
 ### 3.2 Create Formula directory and initial formula
-- [ ] Create `Formula/` directory in tap repo
-- [ ] Create `Formula/nexus-ai.rb` with formula skeleton
-- [ ] Add `desc`, `homepage`, `license` metadata
-- [ ] Add placeholder `url` and `sha256` (will be updated by first release)
-- [ ] Add `depends_on "python@3.11"`
-- [ ] Implement `install` method using `virtualenv_install_with_resources`
-- [ ] Add `test` block
-- [ ] **Verification:** Formula file has valid Ruby syntax
+- [x] Create `Formula/` directory in tap repo
+- [x] Create `Formula/nexus-ai.rb` with formula skeleton
+- [x] Add `desc`, `homepage`, `license` metadata
+- [x] Add placeholder `url` and `sha256` (will be updated by first release)
+- [x] Add `depends_on "python@3.11"`
+- [x] Implement `install` method using `virtualenv_install_with_resources`
+- [x] Add `test` block
+- [x] **Verification:** Formula file has valid Ruby syntax
 
 ### 3.3 Create tap update workflow
-- [ ] Create `.github/workflows/update-formula.yml` in tap repo
-- [ ] Configure `repository_dispatch` trigger for `update-formula` event
-- [ ] Implement formula update logic (sed for url and sha256)
-- [ ] Configure git commit and push
-- [ ] **Verification:** Workflow YAML is valid
+- [x] Create `.github/workflows/update-formula.yml` in tap repo
+- [x] Configure `repository_dispatch` trigger for `update-formula` event
+- [x] Implement formula update logic (sed for url and sha256)
+- [x] Configure git commit and push
+- [x] **Verification:** Workflow YAML is valid
 
 ### 3.4 Update tap README
-- [ ] Document tap usage: `brew tap N3SSQwiK/nexus-ai`
-- [ ] Document installation: `brew install nexus-ai`
-- [ ] Document one-liner: `brew install N3SSQwiK/nexus-ai/nexus-ai`
-- [ ] **Verification:** README is clear and complete
+- [x] Document tap usage: `brew tap N3SSQwiK/nexus-ai`
+- [x] Document installation: `brew install nexus-ai`
+- [x] Document one-liner: `brew install N3SSQwiK/nexus-ai/nexus-ai`
+- [x] **Verification:** README is clear and complete
 
 ### 3.5 Test formula locally (with placeholder values)
 - [ ] Run `brew audit --strict Formula/nexus-ai.rb`
@@ -105,18 +105,18 @@ This phase must be completed first as all other phases depend on the new structu
 ## Phase 4: Release Automation
 
 ### 4.1 Create Personal Access Token
-- [ ] Create GitHub PAT with `repo` scope for tap repo access
-- [ ] Add PAT as secret `TAP_UPDATE_TOKEN` in agent-tools repo settings
-- [ ] **Verification:** Secret is visible in repo settings (value hidden)
+- [x] Create GitHub PAT with `repo` scope for tap repo access
+- [x] Add PAT as secret `TAP_UPDATE_TOKEN` in agent-tools repo settings
+- [x] **Verification:** Secret is visible in repo settings (value hidden)
 
 ### 4.2 Create release workflow
-- [ ] Create `.github/workflows/release.yml` in agent-tools repo
-- [ ] Configure trigger on tag push (`v*`)
-- [ ] Add checkout step
-- [ ] Add GitHub Release creation step with auto-generated notes
-- [ ] Add step to compute SHA256 of release tarball
-- [ ] Add repository-dispatch step to trigger tap update
-- [ ] **Verification:** Workflow YAML is valid
+- [x] Create `.github/workflows/release.yml` in agent-tools repo
+- [x] Configure trigger on tag push (`v*`)
+- [x] Add checkout step
+- [x] Add GitHub Release creation step with auto-generated notes
+- [x] Add step to compute SHA256 of release tarball
+- [x] Add repository-dispatch step to trigger tap update
+- [x] **Verification:** Workflow YAML is valid
 
 ### 4.3 Test release workflow (dry run)
 - [ ] Review workflow for correctness
@@ -128,11 +128,11 @@ This phase must be completed first as all other phases depend on the new structu
 ## Phase 5: First Release
 
 ### 5.1 Final pre-release checks
-- [ ] Ensure all tests pass locally
-- [ ] Ensure `pip install -e . && nexus-ai` works
-- [ ] Ensure `./install.sh` still works
-- [ ] Review all changes for completeness
-- [ ] **Verification:** All local checks pass
+- [x] Ensure all tests pass locally
+- [x] Ensure `pip install -e . && nexus-ai` works
+- [x] Ensure `./install.sh` still works
+- [x] Review all changes for completeness
+- [x] **Verification:** All local checks pass
 
 ### 5.2 Create and push v1.0.0 tag
 - [ ] `git tag v1.0.0`
@@ -200,10 +200,10 @@ Phase 2 (Tarball Config)              Phase 3 (Homebrew Tap)       │
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| Phase 0 | Pending | Repository Restructuring |
-| Phase 1 | Pending | Python Packaging |
-| Phase 2 | Pending | Tarball Configuration |
-| Phase 3 | Pending | Homebrew Tap Repository |
-| Phase 4 | Pending | Release Automation |
-| Phase 5 | Pending | First Release |
-| Phase 6 | Pending | Documentation |
+| Phase 0 | ✅ Complete | Repository Restructuring |
+| Phase 1 | ✅ Complete | Python Packaging |
+| Phase 2 | ✅ Complete | Tarball Configuration |
+| Phase 3 | ✅ Complete | Homebrew Tap Repository |
+| Phase 4 | ✅ Complete | Release Automation |
+| Phase 5 | 🔄 In Progress | First Release (PR ready, awaiting merge + tag) |
+| Phase 6 | ⏳ Pending | Documentation |

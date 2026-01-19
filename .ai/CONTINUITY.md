@@ -1,15 +1,16 @@
 # Continuity
 
 ## Summary
-Nexus-AI is a TUI installer for configuring AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI) with shared features. Maestro v2 multi-agent orchestration is complete and all OpenSpec changes archived.
+Nexus-AI is a TUI installer for configuring AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI) with shared features. Maestro v2 multi-agent orchestration is production-ready with robust dispatch patterns, guardrails, and standardized UX.
 
 ## Completed
-- Merged PR #2: Maestro v2 (18 slash commands across 3 tools)
-- Archived `document-installer-spec` → created `specs/installer/` (9 requirements)
-- Unified installer to use file copies for all tools (symlinks → copies)
-- Archived `rebuild-maestro-orchestration` → created `specs/maestro-orchestration/` (14 requirements)
-- Fixed CLI dispatch patterns in maestro-run commands (added Claude CLI pattern)
-- Expanded USER-GUIDE.md with lifecycle details, flow diagrams, quality gates
+- Applied and archived `fix-maestro-dispatch-patterns` OpenSpec change
+- Added spoke guardrails (5 strict rules) to all task handoff prompts
+- Standardized all user decision points to structured numbered menus
+- Added "Other" option to challenge/review menus for free-text input
+- Updated main spec with CLI Dispatch Patterns, Structured Menus, Guardrails
+- Updated all Maestro documentation (README, TROUBLESHOOTING, STATE-FILE-SPEC)
+- Validated fixes with cross-tool testing (Claude, Gemini, Codex spokes)
 
 ## In Progress
 None
@@ -18,22 +19,23 @@ None
 None
 
 ## Key Files
-- `installer/python/nexus.py` - TUI installer (all tools now use file copies)
-- `openspec/specs/` - 3 specs: continuity, installer, maestro-orchestration
-- `features/maestro/docs/USER-GUIDE.md` - Comprehensive Maestro documentation
-- `docs/FUTURE.md` - Deferred work: duplicate spec detection, cross-tool testing
+- `openspec/specs/maestro-orchestration/spec.md` - Main Maestro specification (19 requirements)
+- `features/maestro/claude/commands/maestro-*.md` - Claude slash commands with menus
+- `features/maestro/docs/TROUBLESHOOTING.md` - New sections for permissions, guardrails, tokens
+- `openspec/changes/archive/2026-01-17-fix-maestro-dispatch-patterns/` - Archived change
 
 ## Context
 - All work committed and pushed to `main` branch
 - No active OpenSpec changes (clean slate)
-- Cross-tool hub→spoke testing deferred to future OpenSpec change
-- Installation now uses file copies (self-contained, no repo dependency)
+- Known limitation: global instructions can override spoke guardrails
+- Future optimizations identified: hub file injection for Codex/Claude spokes
 
 ## Suggested Prompt
-> Run a full installation test with `./install.sh` selecting all tools and Maestro
-> feature. Verify commands are file copies (not symlinks) with `ls -la ~/.claude/commands/`.
-> Then consider creating an OpenSpec change for cross-tool integration testing
-> documented in `docs/FUTURE.md`.
+> Consider creating an OpenSpec change for hub file injection optimization -
+> pre-injecting file contents for Codex/Claude spokes like Gemini's `@path` syntax.
+> Alternatively, explore global instruction isolation for spoke sessions to prevent
+> guardrail conflicts. Review `docs/FUTURE.md` and findings in archived assessment
+> at `openspec/changes/archive/2026-01-17-fix-maestro-dispatch-patterns/`.
 
 ## Source
-Claude Code | 2026-01-17 04:24 UTC
+Claude Code | 2026-01-18 06:29 UTC
