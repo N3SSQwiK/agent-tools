@@ -13,46 +13,55 @@ Configuration and commands for AI coding assistants.
 
 ## Install
 
+### Homebrew (Recommended)
+
+```bash
+brew install N3SSQwiK/nexus-ai/nexus-ai
+```
+
+Or add the tap first:
+```bash
+brew tap N3SSQwiK/nexus-ai
+brew install nexus-ai
+```
+
+Then run:
+```bash
+nexus-ai
+```
+
+### From Source
+
 ```bash
 git clone https://github.com/N3SSQwiK/agent-tools.git ~/agent-tools
 cd ~/agent-tools
-chmod +x *.sh
 ./install.sh
 ```
 
 The installer provides an interactive TUI for selecting tools and features.
 
-**Requirements:** Python 3.9+ (recommended) or Go 1.21+
-
-**Legacy installers (bash only):**
-```bash
-./install-claude.sh   # Claude Code only
-./install-gemini.sh   # Gemini CLI only
-./install-codex.sh    # Codex CLI only
-```
+**Requirements:** Python 3.9+
 
 ## Repo Structure
 
 ```
 agent-tools/
-├── features/                    # Feature modules
-│   ├── continuity/              # Session continuity feature
-│   │   ├── claude/              # Claude Code files
-│   │   ├── gemini/              # Gemini CLI files
-│   │   └── codex/               # Codex CLI files
-│   └── maestro/                 # Multi-agent orchestration
-│       ├── claude/              # Claude Code commands
-│       ├── gemini/              # Gemini CLI extensions
-│       ├── codex/               # Codex CLI prompts
-│       └── docs/                # Maestro documentation
-├── installer/                   # Interactive TUI installers
-│   ├── go/                      # Go + Bubbletea version
-│   └── python/                  # Python + Textual version
-├── docs/                        # Documentation
-│   ├── CLAUDE-COMMANDS.md
-│   ├── GEMINI-EXTENSIONS.md
-│   └── CODEX-COMMANDS.md
-└── install*.sh                  # Install scripts
+├── installer/
+│   └── python/
+│       ├── nexus.py             # TUI application
+│       └── features/            # Feature modules (bundled with package)
+│           ├── continuity/      # Session continuity feature
+│           │   ├── claude/      # Claude Code files
+│           │   ├── gemini/      # Gemini CLI files
+│           │   └── codex/       # Codex CLI files
+│           └── maestro/         # Multi-agent orchestration
+│               ├── claude/      # Claude Code commands
+│               ├── gemini/      # Gemini CLI extensions
+│               ├── codex/       # Codex CLI prompts
+│               └── docs/        # Maestro documentation
+├── pyproject.toml               # Python package configuration
+├── install.sh                   # Bootstrap script (creates venv, runs TUI)
+└── docs/                        # Documentation
 ```
 
 ## Features
@@ -127,18 +136,18 @@ Multi-agent orchestration system enabling any AI tool to coordinate complex task
 - `.ai/MAESTRO.md` - Orchestration state (tasks, status, dependencies)
 - `.ai/MAESTRO-LOG.md` - Execution log (opt-in via menu or `--log=summary`)
 
-**Documentation:** See [features/maestro/docs/](features/maestro/docs/) for the full user guide, spoke contract, and troubleshooting.
+**Documentation:** See [installer/python/features/maestro/docs/](installer/python/features/maestro/docs/) for the full user guide, spoke contract, and troubleshooting.
 
 ## Adding Features
 
-1. Create directory: `features/<feature-name>/`
+1. Create directory: `installer/python/features/<feature-name>/`
 2. Add tool-specific subdirectories with config files
-3. Run `./install.sh` to install
+3. Run `nexus-ai` (or `./install.sh`) to install
 
 ### Structure for a new feature:
 
 ```
-features/<feature-name>/
+installer/python/features/<feature-name>/
 ├── claude/
 │   ├── CLAUDE.md              # Global instructions (merged, optional)
 │   └── commands/
@@ -171,6 +180,22 @@ Config files use managed blocks to preserve your existing configuration:
 ```
 
 Your content outside these markers is preserved during updates.
+
+## Development
+
+For contributors working on the codebase:
+
+```bash
+# Clone the repo
+git clone https://github.com/N3SSQwiK/agent-tools.git
+cd agent-tools
+
+# Install in editable mode
+pip install -e .
+
+# Run the TUI
+nexus-ai
+```
 
 ## Documentation
 

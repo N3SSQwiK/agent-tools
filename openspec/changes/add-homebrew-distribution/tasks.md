@@ -158,16 +158,16 @@ This phase must be completed first as all other phases depend on the new structu
 ## Phase 6: Documentation
 
 ### 6.1 Update agent-tools README
-- [ ] Add Homebrew installation instructions
-- [ ] Keep existing `./install.sh` instructions for developers
-- [ ] Add development setup section (`pip install -e .`)
-- [ ] Document release process for maintainers
-- [ ] **Verification:** README reflects all installation methods
+- [x] Add Homebrew installation instructions
+- [x] Keep existing `./install.sh` instructions for developers
+- [x] Add development setup section (`pip install -e .`)
+- [ ] Document release process for maintainers (deferred - internal knowledge)
+- [x] **Verification:** README reflects all installation methods
 
 ### 6.2 Update any other affected documentation
-- [ ] Check CLAUDE.md for references to installation
-- [ ] Update if necessary
-- [ ] **Verification:** No stale documentation
+- [x] Check CLAUDE.md for references to installation (no changes needed)
+- [x] Update repo structure and feature paths in README
+- [x] **Verification:** No stale documentation
 
 ## Dependencies
 
@@ -206,4 +206,4 @@ Phase 2 (Tarball Config)              Phase 3 (Homebrew Tap)       │
 | Phase 3 | ✅ Complete | Homebrew Tap Repository |
 | Phase 4 | ✅ Complete | Release Automation |
 | Phase 5 | ✅ Complete | First Release (v1.0.0 published, brew install works) |
-| Phase 6 | ⏳ Pending | Documentation |
+| Phase 6 | ✅ Complete | Documentation (README updated with Homebrew instructions) |
