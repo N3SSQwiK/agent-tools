@@ -197,6 +197,22 @@ pip install -e .
 nexus-ai
 ```
 
+### Releasing
+
+To release a new version:
+
+1. Update version in `installer/__init__.py` and `pyproject.toml`
+2. Commit and push to main
+3. Create and push a tag:
+   ```bash
+   git tag v1.x.x
+   git push origin v1.x.x
+   ```
+
+The release workflow will automatically:
+- Create a GitHub Release with auto-generated notes
+- Update the Homebrew tap formula with the new version and SHA256
+
 ## Documentation
 
 - [Claude Code Commands](docs/CLAUDE-COMMANDS.md)
