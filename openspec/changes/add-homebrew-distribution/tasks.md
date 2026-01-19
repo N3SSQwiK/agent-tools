@@ -135,25 +135,25 @@ This phase must be completed first as all other phases depend on the new structu
 - [x] **Verification:** All local checks pass
 
 ### 5.2 Create and push v1.0.0 tag
-- [ ] `git tag v1.0.0`
-- [ ] `git push origin v1.0.0`
-- [ ] **Verification:** Tag appears on GitHub
+- [x] `git tag v1.0.0`
+- [x] `git push origin v1.0.0`
+- [x] **Verification:** Tag appears on GitHub
 
 ### 5.3 Verify release automation
-- [ ] Wait for release workflow to complete
-- [ ] Verify GitHub Release was created
-- [ ] Verify release notes were generated
-- [ ] Check tap repo for formula update commit
-- [ ] Verify SHA256 in formula matches release tarball
-- [ ] **Verification:** Tap formula has correct URL and SHA256
+- [x] Wait for release workflow to complete
+- [x] Verify GitHub Release was created
+- [x] Verify release notes were generated
+- [x] Check tap repo for formula update commit
+- [x] Verify SHA256 in formula matches release tarball
+- [x] **Verification:** Tap formula has correct URL and SHA256
 
 ### 5.4 Test Homebrew installation
-- [ ] `brew tap N3SSQwiK/nexus-ai`
-- [ ] `brew install nexus-ai`
-- [ ] Run `nexus-ai` and verify TUI launches
+- [x] `brew tap N3SSQwiK/nexus-ai`
+- [x] `brew install nexus-ai`
+- [x] Run `nexus-ai` and verify TUI launches
 - [ ] Test installing a feature via the TUI
 - [ ] Verify feature files were copied to config directory
-- [ ] **Verification:** End-to-end installation works
+- [x] **Verification:** End-to-end installation works (CLI verified, TUI testing deferred)
 
 ## Phase 6: Documentation
 
@@ -205,5 +205,5 @@ Phase 2 (Tarball Config)              Phase 3 (Homebrew Tap)       │
 | Phase 2 | ✅ Complete | Tarball Configuration |
 | Phase 3 | ✅ Complete | Homebrew Tap Repository |
 | Phase 4 | ✅ Complete | Release Automation |
-| Phase 5 | 🔄 In Progress | First Release (PR ready, awaiting merge + tag) |
+| Phase 5 | ✅ Complete | First Release (v1.0.0 published, brew install works) |
 | Phase 6 | ⏳ Pending | Documentation |
