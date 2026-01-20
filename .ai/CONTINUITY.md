@@ -1,16 +1,16 @@
 # Continuity
 
 ## Summary
-Nexus-AI is a TUI installer for configuring AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI) with shared features. Maestro v2 multi-agent orchestration is production-ready with robust dispatch patterns, guardrails, and standardized UX.
+Nexus-AI is a TUI installer for AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI). Now distributed via Homebrew (`brew install N3SSQwiK/nexus-ai/nexus-ai`) with automated release pipeline.
 
 ## Completed
-- Applied and archived `fix-maestro-dispatch-patterns` OpenSpec change
-- Added spoke guardrails (5 strict rules) to all task handoff prompts
-- Standardized all user decision points to structured numbered menus
-- Added "Other" option to challenge/review menus for free-text input
-- Updated main spec with CLI Dispatch Patterns, Structured Menus, Guardrails
-- Updated all Maestro documentation (README, TROUBLESHOOTING, STATE-FILE-SPEC)
-- Validated fixes with cross-tool testing (Claude, Gemini, Codex spokes)
+- Implemented Homebrew distribution with tap repo (`N3SSQwiK/homebrew-nexus-ai`)
+- Python packaging: `pyproject.toml`, `__init__.py` files, `main()` entry point
+- Release automation: tag push triggers GitHub Release + tap formula auto-update
+- Fixed formula bugs: dependency resolution (`python -m pip`), trailing whitespace
+- Verified end-to-end: `brew install` → TUI → features installed to all 3 CLI tools
+- Documented all Homebrew learnings in `CLAUDE.md`
+- Archived `add-homebrew-distribution` OpenSpec change, created `distribution` spec
 
 ## In Progress
 None
@@ -19,23 +19,24 @@ None
 None
 
 ## Key Files
-- `openspec/specs/maestro-orchestration/spec.md` - Main Maestro specification (19 requirements)
-- `features/maestro/claude/commands/maestro-*.md` - Claude slash commands with menus
-- `features/maestro/docs/TROUBLESHOOTING.md` - New sections for permissions, guardrails, tokens
-- `openspec/changes/archive/2026-01-17-fix-maestro-dispatch-patterns/` - Archived change
+- `pyproject.toml` - Python package configuration with entry point
+- `installer/python/nexus.py` - TUI with `get_features_path()` for dual-mode operation
+- `.github/workflows/release.yml` - Release automation with retry loop and tap dispatch
+- `CLAUDE.md` - Comprehensive Homebrew distribution guide (new section)
+- `homebrew-nexus-ai/Formula/nexus-ai.rb` - Homebrew formula (separate repo)
 
 ## Context
-- All work committed and pushed to `main` branch
-- No active OpenSpec changes (clean slate)
-- Known limitation: global instructions can override spoke guardrails
-- Future optimizations identified: hub file injection for Codex/Claude spokes
+- v1.0.0 released and available via Homebrew
+- All work committed to `main`, tap repo also up to date
+- One pending OpenSpec change: `add-hub-task-classification` (0/13 tasks)
+- Known formula pattern: use `python -m pip install` not `venv.pip_install` (--no-deps issue)
 
 ## Suggested Prompt
-> Consider creating an OpenSpec change for hub file injection optimization -
-> pre-injecting file contents for Codex/Claude spokes like Gemini's `@path` syntax.
-> Alternatively, explore global instruction isolation for spoke sessions to prevent
-> guardrail conflicts. Review `docs/FUTURE.md` and findings in archived assessment
-> at `openspec/changes/archive/2026-01-17-fix-maestro-dispatch-patterns/`.
+> The `add-hub-task-classification` OpenSpec change is pending (0/13 tasks).
+> This addresses interactive task dispatch to spokes - hub should handle tasks
+> requiring user input (like `npm create vite`) instead of delegating to spokes
+> running with `-y` flags. Run `openspec show add-hub-task-classification` to
+> review the proposal and `openspec apply add-hub-task-classification` to start.
 
 ## Source
-Claude Code | 2026-01-18 06:29 UTC
+Claude Code | 2026-01-19 03:38 UTC
