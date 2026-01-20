@@ -13,7 +13,19 @@ Nexus-AI is a TUI installer for AI assistant CLI tools (Claude Code, Gemini CLI,
 - Archived `add-homebrew-distribution` OpenSpec change, created `distribution` spec
 
 ## In Progress
-None
+Reviewed 5 pending OpenSpec proposals and established implementation order.
+
+## Pending OpenSpec Changes (Recommended Order)
+
+| # | Change | Status | Rationale |
+|---|--------|--------|-----------|
+| 1 | `maestro-spoke-availability` | Pending | Foundation — detect available tools before planning |
+| 2 | `add-hub-task-classification` | Pending (0/13 tasks) | Build on availability; classify tasks before dispatch |
+| 3 | `add-delegation-method` | Pending | Complete dispatch logic (Task tool vs CLI spawn) |
+| 4 | `add-continuity-hooks` | Pending | Independent; event-driven triggers for continuity |
+| 5 | `add-feature-uninstall` | Pending | Independent; depends on hooks for full implementation |
+
+**Dependency chain**: availability → classification → delegation method
 
 ## Blocked
 None
@@ -22,21 +34,18 @@ None
 - `pyproject.toml` - Python package configuration with entry point
 - `installer/python/nexus.py` - TUI with `get_features_path()` for dual-mode operation
 - `.github/workflows/release.yml` - Release automation with retry loop and tap dispatch
-- `CLAUDE.md` - Comprehensive Homebrew distribution guide (new section)
-- `homebrew-nexus-ai/Formula/nexus-ai.rb` - Homebrew formula (separate repo)
+- `CLAUDE.md` - Comprehensive Homebrew distribution guide
+- `openspec/changes/` - Contains all 5 pending proposals
 
 ## Context
 - v1.0.0 released and available via Homebrew
-- All work committed to `main`, tap repo also up to date
-- One pending OpenSpec change: `add-hub-task-classification` (0/13 tasks)
+- All previous work committed to `main`, tap repo also up to date
+- Case study (`CASE-STUDY-CHALLENGE.md`) documented the `npm create vite` dispatch issue that motivated `add-hub-task-classification`
 - Known formula pattern: use `python -m pip install` not `venv.pip_install` (--no-deps issue)
 
 ## Suggested Prompt
-> The `add-hub-task-classification` OpenSpec change is pending (0/13 tasks).
-> This addresses interactive task dispatch to spokes - hub should handle tasks
-> requiring user input (like `npm create vite`) instead of delegating to spokes
-> running with `-y` flags. Run `openspec show add-hub-task-classification` to
-> review the proposal and `openspec apply add-hub-task-classification` to start.
+> Start implementing the OpenSpec changes in order. Run `openspec apply maestro-spoke-availability`
+> to begin with spoke availability detection, which is the foundation for the other Maestro improvements.
 
 ## Source
-Claude Code | 2026-01-19 03:38 UTC
+Claude Code | 2026-01-20 UTC

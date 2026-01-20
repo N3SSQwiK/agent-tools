@@ -1,0 +1,14 @@
+{
+  "_comment": "Nexus-AI Autonomous Preset for Gemini CLI - Minimal interruptions",
+  "tools": {
+    "sandbox": true,
+    "autoApprove": [
+      "read_file",
+      "edit_file",
+      "write_file",
+      "glob",
+      "grep",
+      "run_shell_command"
+    ]
+  }
+}

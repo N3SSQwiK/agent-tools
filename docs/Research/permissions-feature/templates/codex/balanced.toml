@@ -1,0 +1,19 @@
+# Nexus-AI Balanced Preset for Codex CLI
+# Auto-approve edits, ask for other operations
+
+approval_policy = "auto-edit"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+# Disable network access to prevent data exfiltration
+network_access = false
+
+# Allow writes to project and temp directories
+writable_roots = [
+    "./",
+    "/tmp"
+]
+
+# Note: Codex CLI does not support granular command allow/deny rules.
+# The sandbox prevents access to sensitive paths automatically.
+# Use auto-edit to approve file changes without prompting.

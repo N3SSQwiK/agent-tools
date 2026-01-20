@@ -1,0 +1,25 @@
+# Nexus-AI Conservative Policy Rules for Gemini CLI
+# Place in ~/.gemini/policies/nexus-conservative.toml
+
+# Block access to sensitive files
+[[rule]]
+toolName = "read_file"
+commandRegex = ".*\\.env.*|.*secrets.*|.*\\.pem$|.*\\.key$|.*credential.*|.*password.*"
+decision = "deny"
+priority = 999
+
+# Block destructive shell commands
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = [
+    "rm -rf",
+    "rm -r",
+    "git push --force",
+    "git reset --hard",
+    "curl",
+    "wget",
+    "nc",
+    "netcat"
+]
+decision = "deny"
+priority = 999

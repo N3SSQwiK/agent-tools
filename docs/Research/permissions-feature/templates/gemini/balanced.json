@@ -1,0 +1,41 @@
+{
+  "_comment": "Nexus-AI Balanced Preset for Gemini CLI - Auto-approve safe operations",
+  "tools": {
+    "sandbox": true,
+    "autoApprove": [
+      "read_file",
+      "glob",
+      "grep",
+      "run_shell_command(npm run lint)",
+      "run_shell_command(npm run test)",
+      "run_shell_command(npm run build)",
+      "run_shell_command(npm run dev)",
+      "run_shell_command(npm install)",
+      "run_shell_command(npm ci)",
+      "run_shell_command(yarn lint)",
+      "run_shell_command(yarn test)",
+      "run_shell_command(yarn build)",
+      "run_shell_command(yarn install)",
+      "run_shell_command(pnpm lint)",
+      "run_shell_command(pnpm test)",
+      "run_shell_command(pnpm build)",
+      "run_shell_command(pnpm install)",
+      "run_shell_command(git status)",
+      "run_shell_command(git diff)",
+      "run_shell_command(git log)",
+      "run_shell_command(git show)",
+      "run_shell_command(git branch)",
+      "run_shell_command(git add)",
+      "run_shell_command(git commit)",
+      "run_shell_command(make lint)",
+      "run_shell_command(make test)",
+      "run_shell_command(make build)",
+      "run_shell_command(cargo check)",
+      "run_shell_command(cargo test)",
+      "run_shell_command(cargo build)",
+      "run_shell_command(go test)",
+      "run_shell_command(go build)",
+      "run_shell_command(python -m pytest)"
+    ]
+  }
+}

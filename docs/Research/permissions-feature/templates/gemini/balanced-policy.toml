@@ -1,0 +1,38 @@
+# Nexus-AI Balanced Policy Rules for Gemini CLI
+# Place in ~/.gemini/policies/nexus-balanced.toml
+
+# Block access to sensitive files
+[[rule]]
+toolName = "read_file"
+commandRegex = ".*\\.env.*|.*secrets.*|.*\\.pem$|.*\\.key$|.*credential.*|.*password.*"
+decision = "deny"
+priority = 999
+
+# Block destructive shell commands
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = [
+    "rm -rf",
+    "rm -r",
+    "git push --force",
+    "git reset --hard",
+    "curl",
+    "wget",
+    "nc",
+    "netcat",
+    "chmod 777",
+    "sudo"
+]
+decision = "deny"
+priority = 999
+
+# Require approval for pushing and publishing
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = [
+    "git push",
+    "npm publish",
+    "docker push"
+]
+decision = "ask"
+priority = 100

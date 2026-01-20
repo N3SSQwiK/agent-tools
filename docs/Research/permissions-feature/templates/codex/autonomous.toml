@@ -1,0 +1,27 @@
+# Nexus-AI Autonomous Preset for Codex CLI
+# Minimal interruptions - use in trusted environments only
+
+approval_policy = "full-auto"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+# Network access still disabled for safety even in autonomous mode
+network_access = false
+
+# Allow writes to common development directories
+writable_roots = [
+    "./",
+    "/tmp",
+    "~/.npm",
+    "~/.cargo",
+    "~/.cache",
+    "~/.local"
+]
+
+# WARNING: full-auto mode will execute commands without prompting.
+# The sandbox still provides protection against:
+# - Writing outside writable_roots
+# - Network access (unless explicitly enabled)
+# - Accessing system files
+#
+# Use only in isolated/containerized environments for CI/CD.

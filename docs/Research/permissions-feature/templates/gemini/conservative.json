@@ -1,0 +1,11 @@
+{
+  "_comment": "Nexus-AI Conservative Preset for Gemini CLI - Maximum safety",
+  "tools": {
+    "sandbox": true,
+    "autoApprove": [
+      "read_file",
+      "glob",
+      "grep"
+    ]
+  }
+}

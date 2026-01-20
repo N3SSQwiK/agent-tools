@@ -1,0 +1,16 @@
+# Nexus-AI Conservative Preset for Codex CLI
+# Maximum safety - ask before most actions
+
+approval_policy = "suggest"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+# Disable network access to prevent data exfiltration
+network_access = false
+
+# Only allow writes to current directory
+writable_roots = ["./"]
+
+# Note: Codex CLI relies on sandbox + approval prompts rather than
+# granular command rules. For finer control, use approval_policy = "suggest"
+# which prompts for every action.

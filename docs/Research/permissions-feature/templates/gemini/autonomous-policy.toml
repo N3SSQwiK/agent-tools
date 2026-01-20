@@ -1,0 +1,43 @@
+# Nexus-AI Autonomous Policy Rules for Gemini CLI
+# Place in ~/.gemini/policies/nexus-autonomous.toml
+# WARNING: Use only in trusted/isolated environments
+
+# Block access to sensitive files (still enforced in autonomous mode)
+[[rule]]
+toolName = "read_file"
+commandRegex = ".*\\.env.*|.*secrets.*|.*\\.pem$|.*\\.key$|.*credential.*|.*password.*"
+decision = "deny"
+priority = 999
+
+# Block catastrophic commands (still enforced in autonomous mode)
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = [
+    "rm -rf /",
+    "rm -rf /*",
+    "rm -rf ~",
+    "git push --force origin main",
+    "git push --force origin master",
+    "git push -f origin main",
+    "git push -f origin master",
+    "chmod -R 777 /",
+    "sudo rm"
+]
+decision = "deny"
+priority = 999
+
+# Require approval for dangerous operations
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = [
+    "git push --force",
+    "git push -f",
+    "rm -rf",
+    "kubectl delete",
+    "kubectl apply",
+    "docker push",
+    "npm publish",
+    "sudo"
+]
+decision = "ask"
+priority = 100
