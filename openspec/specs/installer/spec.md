@@ -1,7 +1,7 @@
 # installer Specification
 
 ## Purpose
-TBD - created by archiving change document-installer-spec. Update Purpose after archive.
+Define the installation behavior for Nexus-AI features across Claude Code, Gemini CLI, and Codex CLI tools.
 ## Requirements
 ### Requirement: Feature Directory Structure
 Each feature MUST follow a standard directory structure under `features/<feature>/`.
@@ -44,17 +44,17 @@ The installer MUST support features with multiple command files using glob patte
 #### Scenario: Claude multi-command installation
 - **Given** a feature with commands: `<feature>-a.md`, `<feature>-b.md`, `<feature>-c.md`
 - **When** installing for Claude Code
-- **Then** the installer symlinks ALL files matching `features/<feature>/claude/commands/<feature>-*.md` to `~/.claude/commands/`
+- **Then** the installer copies ALL files matching `<feature>.md` or `<feature>-*.md` to `~/.claude/commands/`
 
 #### Scenario: Gemini multi-command installation
 - **Given** a feature with commands: `<feature>-a.toml`, `<feature>-b.toml`
 - **When** installing for Gemini CLI
-- **Then** the installer copies ALL files matching the glob pattern to the extension's commands directory
+- **Then** the installer copies ALL files matching `<feature>.toml` or `<feature>-*.toml` to `~/.gemini/extensions/<feature>/commands/`
 
 #### Scenario: Codex multi-command installation
 - **Given** a feature with prompts: `<feature>-a.md`, `<feature>-b.md`
 - **When** installing for Codex CLI
-- **Then** the installer symlinks ALL files matching `features/<feature>/codex/prompts/<feature>-*.md` to `~/.codex/prompts/`
+- **Then** the installer copies ALL files matching `<feature>.md` or `<feature>-*.md` to `~/.codex/prompts/`
 
 #### Scenario: Empty command directory
 - **Given** a feature with no command files in a tool directory
@@ -100,8 +100,8 @@ The installer MUST rebuild the managed block from all selected features on each 
 #### Scenario: Tool directory does not exist
 - **Given** the tool's config directory (e.g., `~/.claude`) does not exist
 - **When** running the installer with that tool selected
-- **Then** the installer skips the config write for that tool
-- **And** notifies the user to install and run the CLI tool first
+- **Then** the installer creates the directory
+- **And** proceeds with config and command installation
 
 ### Requirement: Claude Code Installation
 The installer MUST install Claude Code features using file copies.
@@ -142,7 +142,7 @@ The installer MUST install Gemini CLI features using file copies and extension e
 #### Scenario: Extension enablement
 - **Given** a feature being installed for Gemini CLI
 - **When** installation completes
-- **Then** the installer updates `~/.gemini/extensions/enabled.json` to include `"<feature>": true`
+- **Then** the installer updates `~/.gemini/extensions/extension-enablement.json` to include `"<feature>": true`
 
 #### Scenario: Config installation
 - **Given** a feature with `features/<feature>/gemini/GEMINI.md`

@@ -491,29 +491,23 @@ class InstallingScreen(Screen):
         selected_features = [f.id for f in FEATURES if f.selected]
 
         # Write managed configs once per tool (rebuild from all selected features)
-        # Only write if tool directory exists (indicates tool is installed and has been run)
+        # Create tool directories if needed and write config files
         selected_tools = [t.id for t in TOOLS if t.selected]
         if "claude" in selected_tools:
             claude_dir = home / ".claude"
-            if claude_dir.exists():
-                src_paths = [features / f / "claude" / "CLAUDE.md" for f in selected_features]
-                write_managed_config(claude_dir / "CLAUDE.md", src_paths)
-            else:
-                self.notify("Skipping Claude config - ~/.claude not found. Install Claude Code and run it once, then re-run this installer.", severity="warning")
+            claude_dir.mkdir(parents=True, exist_ok=True)
+            src_paths = [features / f / "claude" / "CLAUDE.md" for f in selected_features]
+            write_managed_config(claude_dir / "CLAUDE.md", src_paths)
         if "gemini" in selected_tools:
             gemini_dir = home / ".gemini"
-            if gemini_dir.exists():
-                src_paths = [features / f / "gemini" / "GEMINI.md" for f in selected_features]
-                write_managed_config(gemini_dir / "GEMINI.md", src_paths)
-            else:
-                self.notify("Skipping Gemini config - ~/.gemini not found. Install Gemini CLI and run it once, then re-run this installer.", severity="warning")
+            gemini_dir.mkdir(parents=True, exist_ok=True)
+            src_paths = [features / f / "gemini" / "GEMINI.md" for f in selected_features]
+            write_managed_config(gemini_dir / "GEMINI.md", src_paths)
         if "codex" in selected_tools:
             codex_dir = home / ".codex"
-            if codex_dir.exists():
-                src_paths = [features / f / "codex" / "AGENTS.md" for f in selected_features]
-                write_managed_config(codex_dir / "AGENTS.md", src_paths)
-            else:
-                self.notify("Skipping Codex config - ~/.codex not found. Install Codex CLI and run it once, then re-run this installer.", severity="warning")
+            codex_dir.mkdir(parents=True, exist_ok=True)
+            src_paths = [features / f / "codex" / "AGENTS.md" for f in selected_features]
+            write_managed_config(codex_dir / "AGENTS.md", src_paths)
 
         # Install command files per feature
         for i, (step_name, tool_id, feature_id) in enumerate(self.steps):
@@ -541,10 +535,13 @@ class InstallingScreen(Screen):
         commands_dir = claude_dir / "commands"
         commands_dir.mkdir(parents=True, exist_ok=True)
 
-        # Install all command files from the feature's commands directory
+        # Install command files matching feature name pattern: <feature>.md or <feature>-*.md
         src_commands_dir = features / feature / "claude" / "commands"
         if src_commands_dir.exists():
-            for src_cmd in src_commands_dir.glob("*.md"):
+            # Collect files matching either single-command or multi-command pattern
+            src_files = list(src_commands_dir.glob(f"{feature}.md"))
+            src_files.extend(src_commands_dir.glob(f"{feature}-*.md"))
+            for src_cmd in src_files:
                 dst_cmd = commands_dir / src_cmd.name
                 if dst_cmd.exists() or dst_cmd.is_symlink():
                     dst_cmd.unlink()
@@ -559,10 +556,13 @@ class InstallingScreen(Screen):
         src_ext = features / feature / "gemini" / "extensions" / feature
         (ext_dir / "gemini-extension.json").write_text((src_ext / "gemini-extension.json").read_text())
 
-        # Install all command files from the feature's commands directory
+        # Install command files matching feature name pattern: <feature>.toml or <feature>-*.toml
         src_commands_dir = src_ext / "commands"
         if src_commands_dir.exists():
-            for src_cmd in src_commands_dir.glob("*.toml"):
+            # Collect files matching either single-command or multi-command pattern
+            src_files = list(src_commands_dir.glob(f"{feature}.toml"))
+            src_files.extend(src_commands_dir.glob(f"{feature}-*.toml"))
+            for src_cmd in src_files:
                 (cmd_dir / src_cmd.name).write_text(src_cmd.read_text())
 
         enablement_path = gemini_dir / "extensions" / "extension-enablement.json"
@@ -573,10 +573,13 @@ class InstallingScreen(Screen):
         prompts_dir = codex_dir / "prompts"
         prompts_dir.mkdir(parents=True, exist_ok=True)
 
-        # Install all prompt files from the feature's prompts directory
+        # Install prompt files matching feature name pattern: <feature>.md or <feature>-*.md
         src_prompts_dir = features / feature / "codex" / "prompts"
         if src_prompts_dir.exists():
-            for src_prompt in src_prompts_dir.glob("*.md"):
+            # Collect files matching either single-command or multi-command pattern
+            src_files = list(src_prompts_dir.glob(f"{feature}.md"))
+            src_files.extend(src_prompts_dir.glob(f"{feature}-*.md"))
+            for src_prompt in src_files:
                 dst_prompt = prompts_dir / src_prompt.name
                 if dst_prompt.exists() or dst_prompt.is_symlink():
                     dst_prompt.unlink()
