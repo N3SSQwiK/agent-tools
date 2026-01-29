@@ -1,3 +1,8 @@
+---
+name: maestro-status
+description: Display current orchestration state
+---
+
 # Maestro Status Command
 
 Display current orchestration state.

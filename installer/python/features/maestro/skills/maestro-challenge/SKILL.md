@@ -1,3 +1,9 @@
+---
+name: maestro-challenge
+description: Have spokes challenge the hub's plan before execution
+disable-model-invocation: true
+---
+
 # Maestro Challenge Command
 
 Have spokes challenge the hub's plan before execution.

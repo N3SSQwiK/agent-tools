@@ -49,27 +49,29 @@ installer/python/venv/bin/python installer/python/nexus.py
 
 ### Installation Flow
 1. WelcomeScreen → ToolsScreen (select assistants) → FeaturesScreen → InstallingScreen → DoneScreen
-2. Each tool installs to its config directory:
-   - Claude: `~/.claude/commands/` (copies)
-   - Gemini: `~/.gemini/extensions/` (copies + JSON enablement)
-   - Codex: `~/.codex/prompts/` (copies)
+2. Each tool installs skills to its config directory:
+   - Claude: `~/.claude/skills/<name>/` (clean replace via `rmtree` + `copytree`)
+   - Gemini: `~/.gemini/skills/<name>/` (auto-discovered, no enablement needed)
+   - Codex: `~/.codex/skills/<name>/` (requires CLI restart to discover)
+3. Legacy v1.x files (`commands/`, `extensions/`, `prompts/`) are automatically cleaned up
 
 ### Feature Structure
 Features live in `installer/python/features/<name>/` (bundled with Python package):
 ```
 installer/python/features/<name>/
 ├── claude/
-│   ├── CLAUDE.md                 # Global instructions (merged)
-│   └── commands/<name>[-*].md    # Slash command(s) (copied)
+│   └── CLAUDE.md                 # Global instructions (merged)
 ├── gemini/
-│   ├── GEMINI.md                 # Global instructions (merged)
-│   └── extensions/<name>/        # Extension bundle (copied)
-└── codex/
-    ├── AGENTS.md                 # Global instructions (merged)
-    └── prompts/<name>[-*].md     # Prompt(s) (copied)
+│   └── GEMINI.md                 # Global instructions (merged)
+├── codex/
+│   └── AGENTS.md                 # Global instructions (merged)
+└── skills/                       # Unified skills (all tools)
+    └── <skill-name>/
+        ├── SKILL.md              # Skill with YAML frontmatter
+        └── templates/            # Optional template files
 ```
 
-Multi-command features use the `<name>-<subcommand>.md` pattern (e.g., `maestro-plan.md`, `maestro-run.md`).
+Each `SKILL.md` has YAML frontmatter with `name` (kebab-case, ≤64 chars) and `description` (single-line). Optional fields include `disable-model-invocation` for manual-only skills.
 
 ### Feature Path Resolution
 The `get_features_path()` function in `nexus.py` finds features in multiple contexts:

@@ -1,3 +1,8 @@
+---
+name: maestro-review
+description: Have a different spoke review completed work before hub accepts it
+---
+
 # Maestro Review Command
 
 Have a different spoke review completed work before hub accepts it.

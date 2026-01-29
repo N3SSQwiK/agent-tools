@@ -5,8 +5,9 @@ Fraternal colors: Red, White, Navy Blue, Gold
 """
 
 import asyncio
-import os
-import json
+import logging
+import re
+import shutil
 from pathlib import Path
 from dataclasses import dataclass
 
@@ -466,7 +467,7 @@ class InstallingScreen(Screen):
             for tool in TOOLS:
                 if not tool.selected:
                     continue
-                self.steps.append((f"Installing {feature.name} for {tool.name}", tool.id, feature.id))
+                self.steps.append((f"Installing skills for {tool.name}", tool.id, feature.id))
 
         yield Container(
             Banner(id="banner"),
@@ -509,7 +510,18 @@ class InstallingScreen(Screen):
             src_paths = [features / f / "codex" / "AGENTS.md" for f in selected_features]
             write_managed_config(codex_dir / "AGENTS.md", src_paths)
 
-        # Install command files per feature
+        # Gemini skills notice: auto-discovered, no enablement needed
+        if "gemini" in selected_tools:
+            log.info("Gemini CLI auto-discovers skills from ~/.gemini/skills/ — no enablement required")
+
+        # Clean up legacy v1.x files before installing skills
+        all_removed = []
+        for tool_id in selected_tools:
+            all_removed.extend(cleanup_legacy_files(home, tool_id))
+        if all_removed:
+            log.info(f"Cleaned up {len(all_removed)} legacy file(s)")
+
+        # Install skills per feature
         for i, (step_name, tool_id, feature_id) in enumerate(self.steps):
             items[i].set_status("active")
             await self.install_step(tool_id, feature_id)
@@ -522,68 +534,28 @@ class InstallingScreen(Screen):
     async def install_step(self, tool_id: str, feature_id: str) -> None:
         home = Path.home()
         features = self.app.features_path
+        await self.install_skills(home, features, tool_id, feature_id)
 
-        if tool_id == "claude":
-            await self.install_claude(home, features, feature_id)
-        elif tool_id == "gemini":
-            await self.install_gemini(home, features, feature_id)
-        elif tool_id == "codex":
-            await self.install_codex(home, features, feature_id)
+    async def install_skills(self, home: Path, features: Path, tool_id: str, feature_id: str) -> None:
+        """Install skills for a tool by clean-replacing each skill directory."""
+        tool_dir = home / f".{tool_id}"
+        skills_dir = tool_dir / "skills"
+        skills_dir.mkdir(parents=True, exist_ok=True)
 
-    async def install_claude(self, home: Path, features: Path, feature: str) -> None:
-        claude_dir = home / ".claude"
-        commands_dir = claude_dir / "commands"
-        commands_dir.mkdir(parents=True, exist_ok=True)
+        src_skills_dir = features / feature_id / "skills"
+        if not src_skills_dir.exists():
+            return
 
-        # Install command files matching feature name pattern: <feature>.md or <feature>-*.md
-        src_commands_dir = features / feature / "claude" / "commands"
-        if src_commands_dir.exists():
-            # Collect files matching either single-command or multi-command pattern
-            src_files = list(src_commands_dir.glob(f"{feature}.md"))
-            src_files.extend(src_commands_dir.glob(f"{feature}-*.md"))
-            for src_cmd in src_files:
-                dst_cmd = commands_dir / src_cmd.name
-                if dst_cmd.exists() or dst_cmd.is_symlink():
-                    dst_cmd.unlink()
-                dst_cmd.write_text(src_cmd.read_text())
-
-    async def install_gemini(self, home: Path, features: Path, feature: str) -> None:
-        gemini_dir = home / ".gemini"
-        ext_dir = gemini_dir / "extensions" / feature
-        cmd_dir = ext_dir / "commands"
-        cmd_dir.mkdir(parents=True, exist_ok=True)
-
-        src_ext = features / feature / "gemini" / "extensions" / feature
-        (ext_dir / "gemini-extension.json").write_text((src_ext / "gemini-extension.json").read_text())
-
-        # Install command files matching feature name pattern: <feature>.toml or <feature>-*.toml
-        src_commands_dir = src_ext / "commands"
-        if src_commands_dir.exists():
-            # Collect files matching either single-command or multi-command pattern
-            src_files = list(src_commands_dir.glob(f"{feature}.toml"))
-            src_files.extend(src_commands_dir.glob(f"{feature}-*.toml"))
-            for src_cmd in src_files:
-                (cmd_dir / src_cmd.name).write_text(src_cmd.read_text())
-
-        enablement_path = gemini_dir / "extensions" / "extension-enablement.json"
-        update_enablement(enablement_path, feature)
-
-    async def install_codex(self, home: Path, features: Path, feature: str) -> None:
-        codex_dir = home / ".codex"
-        prompts_dir = codex_dir / "prompts"
-        prompts_dir.mkdir(parents=True, exist_ok=True)
-
-        # Install prompt files matching feature name pattern: <feature>.md or <feature>-*.md
-        src_prompts_dir = features / feature / "codex" / "prompts"
-        if src_prompts_dir.exists():
-            # Collect files matching either single-command or multi-command pattern
-            src_files = list(src_prompts_dir.glob(f"{feature}.md"))
-            src_files.extend(src_prompts_dir.glob(f"{feature}-*.md"))
-            for src_prompt in src_files:
-                dst_prompt = prompts_dir / src_prompt.name
-                if dst_prompt.exists() or dst_prompt.is_symlink():
-                    dst_prompt.unlink()
-                dst_prompt.write_text(src_prompt.read_text())
+        for src_skill in src_skills_dir.iterdir():
+            if not src_skill.is_dir():
+                continue
+            warnings = validate_skill(src_skill)
+            for w in warnings:
+                log.warning(w)
+            dst_skill = skills_dir / src_skill.name
+            # Clean replace: remove existing then copy fresh
+            shutil.rmtree(dst_skill, ignore_errors=True)
+            shutil.copytree(src_skill, dst_skill)
 
 
 class DoneScreen(Screen):
@@ -596,23 +568,39 @@ class DoneScreen(Screen):
 
     def compose(self) -> ComposeResult:
         tools = [t.name for t in TOOLS if t.selected]
+        selected_tool_ids = [t.id for t in TOOLS if t.selected]
         features = [f.name for f in FEATURES if f.selected]
+
+        # Build post-install notes
+        notes = []
+        if "codex" in selected_tool_ids:
+            notes.append("• Codex CLI: Restart to discover new skills")
+        if "gemini" in selected_tool_ids:
+            notes.append("• Gemini CLI: Skills auto-discovered on next invocation")
+
+        panel_children = [
+            Static(Text("✓ Installation Complete", style=Style(color=SUCCESS, bold=True)), id="panel-title"),
+            Static(Text.assemble(
+                ("Tools: ", Style(color=TEXT_MUTED)),
+                (", ".join(tools), Style(color=GOLD))
+            ), id="summary-tools"),
+            Static(Text.assemble(
+                ("Features: ", Style(color=TEXT_MUTED)),
+                (", ".join(features), Style(color=GOLD))
+            ), id="summary-features"),
+        ]
+
+        if notes:
+            panel_children.append(Static(
+                Text("\n".join(notes), style=Style(color=TEXT_MUTED, italic=True)),
+                id="post-install-notes"
+            ))
+
+        panel_children.append(Static("Press enter or q to exit", id="panel-help"))
 
         yield Container(
             Banner(id="banner"),
-            Container(
-                Static(Text("✓ Installation Complete", style=Style(color=SUCCESS, bold=True)), id="panel-title"),
-                Static(Text.assemble(
-                    ("Tools: ", Style(color=TEXT_MUTED)),
-                    (", ".join(tools), Style(color=GOLD))
-                ), id="summary-tools"),
-                Static(Text.assemble(
-                    ("Features: ", Style(color=TEXT_MUTED)),
-                    (", ".join(features), Style(color=GOLD))
-                ), id="summary-features"),
-                Static("Press enter or q to exit", id="panel-help"),
-                id="panel"
-            ),
+            Container(*panel_children, id="panel"),
             id="main-container"
         )
 
@@ -663,18 +651,102 @@ def write_managed_config(dst_path: Path, src_paths: list[Path]) -> None:
     dst_path.write_text(content)
 
 
-def update_enablement(path: Path, extension_name: str) -> None:
-    if path.exists():
-        try:
-            data = json.loads(path.read_text())
-        except json.JSONDecodeError:
-            data = {}
-    else:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        data = {}
+log = logging.getLogger("nexus-ai")
 
-    data[extension_name] = True
-    path.write_text(json.dumps(data, indent=2))
+# Known Nexus-AI v1.x file patterns per tool (for legacy cleanup)
+LEGACY_PATTERNS: dict[str, list[str]] = {
+    "claude": [
+        "commands/continuity.md",
+        "commands/maestro-plan.md",
+        "commands/maestro-run.md",
+        "commands/maestro-review.md",
+        "commands/maestro-challenge.md",
+        "commands/maestro-status.md",
+        "commands/maestro-report.md",
+    ],
+    "gemini": [
+        "extensions/continuity/",
+        "extensions/maestro/",
+        "extensions/extension-enablement.json",
+    ],
+    "codex": [
+        "prompts/continuity.md",
+        "prompts/maestro-plan.md",
+        "prompts/maestro-run.md",
+        "prompts/maestro-review.md",
+        "prompts/maestro-challenge.md",
+        "prompts/maestro-status.md",
+        "prompts/maestro-report.md",
+    ],
+}
+
+
+def cleanup_legacy_files(home: Path, tool_id: str) -> list[str]:
+    """Remove known Nexus-AI v1.x files for a tool. Returns list of removed paths."""
+    tool_dir = home / f".{tool_id}"
+    if not tool_dir.exists():
+        return []
+
+    removed = []
+    for pattern in LEGACY_PATTERNS.get(tool_id, []):
+        target = tool_dir / pattern
+        try:
+            if pattern.endswith("/"):
+                if target.is_dir():
+                    shutil.rmtree(target)
+                    removed.append(str(target))
+            else:
+                if target.exists():
+                    target.unlink()
+                    removed.append(str(target))
+        except OSError as e:
+            log.warning(f"Failed to remove legacy file {target}: {e}")
+
+    return removed
+
+KEBAB_CASE_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+
+
+def validate_skill(skill_dir: Path) -> list[str]:
+    """Validate a SKILL.md file's frontmatter. Returns list of warnings (empty = valid)."""
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.exists():
+        return [f"{skill_dir.name}: missing SKILL.md"]
+
+    text = skill_md.read_text()
+
+    # Extract YAML frontmatter (between --- delimiters)
+    if not text.startswith("---"):
+        return [f"{skill_dir.name}: missing YAML frontmatter"]
+
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return [f"{skill_dir.name}: malformed YAML frontmatter"]
+
+    try:
+        # Parse YAML manually (avoid adding PyYAML dependency)
+        frontmatter = {}
+        for line in parts[1].strip().splitlines():
+            if ":" in line:
+                key, _, value = line.partition(":")
+                frontmatter[key.strip()] = value.strip().strip('"').strip("'")
+    except Exception:
+        return [f"{skill_dir.name}: unparseable YAML frontmatter"]
+
+    warnings = []
+    name = frontmatter.get("name", "")
+    if not name:
+        warnings.append(f"{skill_dir.name}: missing 'name' field")
+    elif "\n" in name or len(name) > 64 or not KEBAB_CASE_RE.match(name):
+        warnings.append(f"{skill_dir.name}: 'name' must be single-line kebab-case, ≤64 chars")
+
+    description = frontmatter.get("description", "")
+    if not description:
+        warnings.append(f"{skill_dir.name}: missing 'description' field")
+    elif "\n" in description:
+        warnings.append(f"{skill_dir.name}: 'description' must be single-line")
+
+    return warnings
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -764,7 +836,7 @@ class NexusInstaller(App):
         margin-top: 1;
     }
 
-    #summary-tools, #summary-features {
+    #summary-tools, #summary-features, #post-install-notes {
         background: #1e293b;
         width: 100%;
         padding: 0 0 1 0;

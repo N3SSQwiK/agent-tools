@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nexus-ai"
-version = "1.0.1"
+version = "2.0.0"
 description = "TUI installer for AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI)"
 readme = "README.md"
 requires-python = ">=3.9"

@@ -1,3 +1,8 @@
+---
+name: continuity
+description: Check and update project continuity state in .ai/CONTINUITY.md
+---
+
 # Continuity Command
 
 Update the project's session continuity file.
@@ -96,7 +101,6 @@ Proceed normally. Create `.ai/.legacy-checked` when first writing `.ai/CONTINUIT
 - Keep Summary concise (1-2 sentences)
 - List only the most relevant Key Files (3-5 max)
 - Use UTC timezone (run `date -u "+%Y-%m-%d %H:%M UTC"`)
-- Tool name is "Claude Code"
 
 ## Update Rules (CRITICAL)
 

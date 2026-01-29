@@ -1,40 +1,36 @@
 # Continuity
 
 ## Summary
-Nexus-AI is a TUI installer for AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI). Distributed via Homebrew with automated release pipeline. Licensed under AGPL-3.0-or-later.
+Nexus-AI is a TUI installer for AI assistant CLI tools (Claude Code, Gemini CLI, Codex CLI). Distributed via Homebrew, licensed AGPL-3.0-or-later. Currently preparing v2.0.0 migration from commands/extensions/prompts to unified Agent Skills.
 
 ## Completed
-- **Peer reviewed `migrate-commands-to-skills` proposal** — 3 critical issues identified, draft revisions created
-- Created proposal with 35 tasks across 7 phases for Agent Skills migration
-- v1.0.1 released on Homebrew
-- Documented Maestro hooks research (`docs/Research/maestro-hooks/`)
+- Applied all peer review revisions to `migrate-commands-to-skills` proposal (C1-C3, M1-M3, m1-m3 resolved)
+- Peer re-review verdict: **APPROVE** (95/100 confidence)
+- Maestro plan created: 16 tasks across implementation, migration, and testing phases
+- 3 cross-tool challenge rounds completed (Claude self-challenge, Gemini CLI, Codex CLI)
+- Key challenge fixes: `rmtree`+`copytree` (not merge), no `gemini skills enable --global`, frontmatter validation for Codex, hooks deferred
 
 ## In Progress
-Apply revisions to `migrate-commands-to-skills` proposal to address peer review feedback.
+- Maestro orchestration plan ready for execution (`/maestro run`)
 
 ## Blocked
 None
 
 ## Key Files
-- `docs/Research/migrate-commands-to-skills-review/` — **Start here**: Peer review + draft revisions
-- `openspec/changes/migrate-commands-to-skills/` — Proposal files to update
-- `docs/Research/migrate-commands-to-skills-review/revisions/` — Three revision docs ready to apply
+- `.ai/MAESTRO.md` — **Start here**: 16-task orchestration plan with implementation notes
+- `.ai/MAESTRO-LOG.md` — Detailed execution log (3 challenge rounds logged)
+- `openspec/changes/migrate-commands-to-skills/proposal.md` — Approved proposal with SKILL.md spec, Gemini detection, migration path
+- `openspec/changes/migrate-commands-to-skills/tasks.md` — 49 granular implementation tasks
+- `installer/python/nexus.py` — Primary file to modify (827 lines, 3 install methods to replace)
 
 ## Context
-- Proposal peer review verdict: **REQUEST CHANGES** (~2-3 hours revision effort)
-- Critical issues to address:
-  1. Missing SKILL.md format spec → `revisions/skill-format-spec.md`
-  2. Gemini enablement underspecified → `revisions/gemini-enablement-spec.md`
-  3. No migration path for v1.x users → `revisions/migration-path-spec.md`
-- Official docs fetched: Claude skills, Gemini CLI skills (used in revisions)
+- On `main` branch, 1 commit ahead of origin (proposal revisions committed as `c1be0c8`)
+- Maestro plan uses verification split: Claude Code implements, Gemini/Codex verify their own skills
+- Hooks deferred to follow-up PR (research exists, no production scripts)
+- Codex requires restart after skill install; Gemini auto-discovers
 
 ## Suggested Prompt
-> Apply the peer review revisions to the `migrate-commands-to-skills` proposal:
-> 1. Read `docs/Research/migrate-commands-to-skills-review/README.md` for full context
-> 2. Apply `revisions/skill-format-spec.md` to `proposal.md` and `spec.md`
-> 3. Apply `revisions/gemini-enablement-spec.md` to `spec.md` and `tasks.md`
-> 4. Apply `revisions/migration-path-spec.md` to all three proposal files
-> 5. After applying, re-run peer review to verify critical issues resolved
+> Run `/maestro run` to begin implementing the migrate-commands-to-skills plan. Start with Task 1 (create feature branch `feat/migrate-commands-to-skills`), then Task 2 (add `install_skills()` with `rmtree`+`copytree` to `nexus.py`). The full plan is in `.ai/MAESTRO.md` with 16 tasks and detailed implementation notes. All 3 challenge rounds are complete — plan is approved for execution.
 
 ## Source
-Claude Code | 2026-01-21 15:18 UTC
+Claude Code | 2026-01-29 02:35 UTC

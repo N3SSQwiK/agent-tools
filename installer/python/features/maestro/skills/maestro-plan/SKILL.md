@@ -1,3 +1,8 @@
+---
+name: maestro-plan
+description: Decompose a high-level goal into atomic tasks for multi-agent orchestration
+---
+
 # Maestro Plan Command
 
 Decompose a high-level goal into atomic tasks for multi-agent orchestration.
@@ -61,37 +66,7 @@ If any check fails, decompose further or adjust assignment.
 
 ## Plan Output Format
 
-```markdown
-## Goal
-[User's high-level objective]
-
-## Reconnaissance
-[Summary of codebase analysis - patterns found, key files, constraints discovered]
-
-## Tasks
-
-### Task 1: [description]
-- **Specialist:** code
-- **Tool:** Gemini CLI
-- **Depends:** -
-- **Success Criteria:**
-  - [ ] [Testable criterion]
-
-### Task 2: [description]
-- **Specialist:** test
-- **Tool:** Codex CLI
-- **Depends:** 1
-- **Success Criteria:**
-  - [ ] [Testable criterion]
-
-[Additional tasks...]
-
-## Parallelization
-[Which tasks can run concurrently after dependencies are satisfied]
-
-## Estimated Token Budget
-[Rough estimate based on task complexity]
-```
+See `templates/plan-format.md` for the full plan output template.
 
 ## State File Format
 
@@ -148,7 +123,6 @@ Initialize log if enabled:
 - Each task needs at least one testable success criterion
 - Never auto-approve - always get user confirmation
 - Use UTC timezone for timestamps
-- Hub tool name is "Claude Code"
 
 ## Examples
 

@@ -1,3 +1,8 @@
+---
+name: maestro-report
+description: Generate a human-readable walkthrough from the execution log
+---
+
 # Maestro Report Command
 
 Generate a human-readable walkthrough from the execution log.
