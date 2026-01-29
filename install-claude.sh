@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# Claude Code installer (legacy)
-# For the interactive TUI installer, run: ./install.sh
+# Claude Code installer (DEPRECATED)
+# This script uses the old commands/ format which has been replaced by Agent Skills in v2.0.
+# For the interactive TUI installer, run: ./install.sh or nexus-ai
+
+echo "⚠️  This script is deprecated. Use './install.sh' or 'nexus-ai' instead."
+echo "   See docs/AGENT-SKILLS.md for the new skills format."
+exit 1
 
 set -e
 

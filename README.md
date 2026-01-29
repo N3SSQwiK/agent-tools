@@ -51,13 +51,15 @@ agent-tools/
 │       ├── nexus.py             # TUI application
 │       └── features/            # Feature modules (bundled with package)
 │           ├── continuity/      # Session continuity feature
-│           │   ├── claude/      # Claude Code files
-│           │   ├── gemini/      # Gemini CLI files
-│           │   └── codex/       # Codex CLI files
+│           │   ├── claude/      # Claude Code global instructions
+│           │   ├── gemini/      # Gemini CLI global instructions
+│           │   ├── codex/       # Codex CLI global instructions
+│           │   └── skills/      # Unified skills (all tools)
 │           └── maestro/         # Multi-agent orchestration
-│               ├── claude/      # Claude Code commands
-│               ├── gemini/      # Gemini CLI extensions
-│               ├── codex/       # Codex CLI prompts
+│               ├── claude/      # Claude Code global instructions
+│               ├── gemini/      # Gemini CLI global instructions
+│               ├── codex/       # Codex CLI global instructions
+│               ├── skills/      # Unified skills (6 maestro skills)
 │               └── docs/        # Maestro documentation
 ├── pyproject.toml               # Python package configuration
 ├── install.sh                   # Bootstrap script (creates venv, runs TUI)
@@ -141,33 +143,29 @@ Multi-agent orchestration system enabling any AI tool to coordinate complex task
 ## Adding Features
 
 1. Create directory: `installer/python/features/<feature-name>/`
-2. Add tool-specific subdirectories with config files
-3. Run `nexus-ai` (or `./install.sh`) to install
+2. Add `skills/<skill-name>/SKILL.md` with YAML frontmatter
+3. Optionally add global instruction files per tool (`claude/CLAUDE.md`, etc.)
+4. Run `nexus-ai` (or `./install.sh`) to install
 
 ### Structure for a new feature:
 
 ```
 installer/python/features/<feature-name>/
 ├── claude/
-│   ├── CLAUDE.md              # Global instructions (merged, optional)
-│   └── commands/
-│       └── <feature-name>[-*].md   # Slash command(s)
+│   └── CLAUDE.md              # Global instructions (merged, optional)
 ├── gemini/
-│   ├── GEMINI.md              # Global instructions (merged, optional)
-│   └── extensions/
-│       └── <feature-name>/
-│           ├── gemini-extension.json
-│           └── commands/
-│               └── <feature-name>[-*].toml
-└── codex/
-    ├── AGENTS.md              # Global instructions (merged, optional)
-    └── prompts/
-        └── <feature-name>[-*].md   # Slash command(s)
+│   └── GEMINI.md              # Global instructions (merged, optional)
+├── codex/
+│   └── AGENTS.md              # Global instructions (merged, optional)
+└── skills/                    # Unified skills (all tools)
+    └── <skill-name>/
+        ├── SKILL.md           # Skill with YAML frontmatter
+        └── templates/         # Optional supporting files
 ```
 
-**Single vs. multi-command features:**
-- Single command: `continuity.md`
-- Multiple commands: `maestro-plan.md`, `maestro-run.md`, `maestro-status.md`, etc.
+**Single vs. multi-skill features:**
+- Single skill: `skills/continuity/SKILL.md`
+- Multiple skills: `skills/maestro-plan/SKILL.md`, `skills/maestro-run/SKILL.md`, etc.
 
 ## Managed Blocks
 
@@ -205,8 +203,8 @@ To release a new version:
 2. Commit and push to main
 3. Create and push a tag:
    ```bash
-   git tag v1.x.x
-   git push origin v1.x.x
+   git tag v2.x.x
+   git push origin v2.x.x
    ```
 
 The release workflow will automatically:
@@ -215,6 +213,5 @@ The release workflow will automatically:
 
 ## Documentation
 
-- [Claude Code Commands](docs/CLAUDE-COMMANDS.md)
-- [Gemini CLI Extensions](docs/GEMINI-EXTENSIONS.md)
-- [Codex CLI Custom Prompts](docs/CODEX-COMMANDS.md)
+- [Agent Skills Reference](docs/AGENT-SKILLS.md) — Unified skill format for all tools
+- [Maestro User Guide](installer/python/features/maestro/docs/USER-GUIDE.md) — Multi-agent orchestration

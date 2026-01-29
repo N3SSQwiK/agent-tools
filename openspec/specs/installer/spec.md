@@ -13,53 +13,116 @@ Each feature MUST follow a standard directory structure under `features/<feature
   ```
   features/<feature>/
   ├── claude/
-  │   ├── CLAUDE.md              # Global instructions (optional)
-  │   └── commands/
-  │       └── <feature>[-*].md   # Slash command(s)
+  │   └── CLAUDE.md              # Global instructions (optional)
   ├── gemini/
-  │   ├── GEMINI.md              # Global instructions (optional)
-  │   └── extensions/<feature>/
-  │       ├── gemini-extension.json
-  │       └── commands/
-  │           └── <feature>[-*].toml
-  └── codex/
-      ├── AGENTS.md              # Global instructions (optional)
-      └── prompts/
-          └── <feature>[-*].md   # Slash command(s)
+  │   └── GEMINI.md              # Global instructions (optional)
+  ├── codex/
+  │   └── AGENTS.md              # Global instructions (optional)
+  └── skills/                    # Unified skills (all tools)
+      └── <skill-name>/
+          ├── SKILL.md           # Skill with YAML frontmatter
+          └── templates/         # Optional supporting files
   ```
 
-#### Scenario: Feature with single command
-- **Given** a feature with one command file per tool
+#### Scenario: Feature with single skill
+- **Given** a feature with one skill directory
 - **When** the installer processes the feature
-- **Then** it finds files named exactly `<feature>.md` or `<feature>.toml`
+- **Then** it finds `skills/<skill-name>/SKILL.md`
 
-#### Scenario: Feature with multiple commands
-- **Given** a feature with multiple command files (e.g., `<feature>-plan.md`, `<feature>-run.md`)
+#### Scenario: Feature with multiple skills
+- **Given** a feature with multiple skill directories (e.g., `maestro-plan`, `maestro-run`)
 - **When** the installer processes the feature
-- **Then** it finds all files matching `<feature>-*.md` or `<feature>-*.toml`
+- **Then** it finds all directories under `skills/` and installs each one
 
-### Requirement: Multi-Command File Installation
-The installer MUST support features with multiple command files using glob patterns.
+### Requirement: Skill Installation
+The installer MUST install skills using clean directory replacement.
 
-#### Scenario: Claude multi-command installation
-- **Given** a feature with commands: `<feature>-a.md`, `<feature>-b.md`, `<feature>-c.md`
-- **When** installing for Claude Code
-- **Then** the installer copies ALL files matching `<feature>.md` or `<feature>-*.md` to `~/.claude/commands/`
+#### Scenario: Skill installation for any tool
+- **Given** a feature with skills in `features/<feature>/skills/<skill-name>/`
+- **When** installing for any tool
+- **Then** the installer copies the entire skill directory to `~/.<tool>/skills/<skill-name>/`
+- **And** uses `rmtree` + `copytree` for clean replacement (no ghost files)
 
-#### Scenario: Gemini multi-command installation
-- **Given** a feature with commands: `<feature>-a.toml`, `<feature>-b.toml`
-- **When** installing for Gemini CLI
-- **Then** the installer copies ALL files matching `<feature>.toml` or `<feature>-*.toml` to `~/.gemini/extensions/<feature>/commands/`
+#### Scenario: Skill directory creation
+- **Given** `~/.<tool>/skills/` does not exist
+- **When** installing skills
+- **Then** the installer creates the directory with `mkdir(parents=True, exist_ok=True)`
 
-#### Scenario: Codex multi-command installation
-- **Given** a feature with prompts: `<feature>-a.md`, `<feature>-b.md`
-- **When** installing for Codex CLI
-- **Then** the installer copies ALL files matching `<feature>.md` or `<feature>-*.md` to `~/.codex/prompts/`
+#### Scenario: Skill already installed
+- **Given** a skill directory already exists at the destination
+- **When** re-running installation
+- **Then** the installer removes the existing directory completely before copying
 
-#### Scenario: Empty command directory
-- **Given** a feature with no command files in a tool directory
-- **When** the installer processes that tool
-- **Then** it skips command installation for that tool without error
+#### Scenario: Empty skills directory
+- **Given** a feature with no skill directories in `skills/`
+- **When** the installer processes that feature
+- **Then** it skips skill installation without error
+
+### Requirement: SKILL.md Validation
+The installer MUST validate SKILL.md frontmatter before installation.
+
+#### Scenario: Valid frontmatter
+- **Given** a SKILL.md with YAML frontmatter containing `name` and `description`
+- **When** the installer validates the skill
+- **Then** validation passes with no warnings
+
+#### Scenario: Missing SKILL.md
+- **Given** a skill directory without a SKILL.md file
+- **When** the installer validates the skill
+- **Then** it logs a warning but still installs the directory
+
+#### Scenario: Invalid name format
+- **Given** a SKILL.md with `name` that is not kebab-case or exceeds 64 characters
+- **When** the installer validates the skill
+- **Then** it logs a warning (Codex silently skips skills with invalid frontmatter)
+
+#### Scenario: Multi-line description
+- **Given** a SKILL.md with a multi-line `description`
+- **When** the installer validates the skill
+- **Then** it logs a warning
+
+#### Scenario: Missing frontmatter
+- **Given** a SKILL.md without `---` delimited YAML frontmatter
+- **When** the installer validates the skill
+- **Then** it logs a warning
+
+### Requirement: Legacy Installation Cleanup
+The installer MUST detect and remove known Nexus-AI v1.x files during installation.
+
+#### Scenario: No legacy files
+- **Given** no v1.x files exist for a tool
+- **When** running the installer
+- **Then** cleanup completes with no removals
+
+#### Scenario: Claude legacy files detected
+- **Given** files matching known patterns exist in `~/.claude/commands/` (e.g., `continuity.md`, `maestro-plan.md`)
+- **When** running the installer
+- **Then** the installer removes all matching files
+
+#### Scenario: Gemini legacy files detected
+- **Given** directories matching known patterns exist in `~/.gemini/extensions/` (e.g., `continuity/`, `maestro/`)
+- **When** running the installer
+- **Then** the installer removes all matching directories and `extension-enablement.json`
+
+#### Scenario: Codex legacy files detected
+- **Given** files matching known patterns exist in `~/.codex/prompts/` (e.g., `continuity.md`, `maestro-run.md`)
+- **When** running the installer
+- **Then** the installer removes all matching files
+
+#### Scenario: Cleanup summary
+- **Given** legacy files were found and removed
+- **When** cleanup completes
+- **Then** the installer logs the count of removed files
+
+#### Scenario: Permission error during cleanup
+- **Given** a legacy file cannot be removed due to permissions
+- **When** cleanup encounters the error
+- **Then** the installer logs a warning and continues with remaining files
+
+#### Scenario: Custom user files preserved
+- **Given** a user has custom files in `~/.claude/commands/` that don't match known Nexus-AI patterns
+- **When** running the installer
+- **Then** those custom files are NOT removed
 
 ### Requirement: Managed Config Block Rebuild
 The installer MUST rebuild the managed block from all selected features on each run, replacing any existing managed content.
@@ -101,71 +164,20 @@ The installer MUST rebuild the managed block from all selected features on each 
 - **Given** the tool's config directory (e.g., `~/.claude`) does not exist
 - **When** running the installer with that tool selected
 - **Then** the installer creates the directory
-- **And** proceeds with config and command installation
+- **And** proceeds with config and skill installation
 
-### Requirement: Claude Code Installation
-The installer MUST install Claude Code features using file copies.
+### Requirement: Post-Install Notices
+The installer MUST display tool-specific post-install guidance on the Done screen.
 
-#### Scenario: Command file copy
-- **Given** a feature with command files in `features/<feature>/claude/commands/`
-- **When** installing for Claude Code
-- **Then** the installer copies files from source to `~/.claude/commands/`
-
-#### Scenario: Config installation
-- **Given** a feature with `features/<feature>/claude/CLAUDE.md`
-- **When** installing for Claude Code
-- **Then** the installer merges content into `~/.claude/CLAUDE.md` managed block
-
-#### Scenario: Directory creation
-- **Given** `~/.claude/commands/` does not exist
-- **When** installing for Claude Code
-- **Then** the installer creates the directory with appropriate permissions
-
-#### Scenario: Existing symlink replacement
-- **Given** a symlink exists at the destination from a previous installation
-- **When** re-running the installer
-- **Then** the installer removes the symlink and creates a file copy
-
-### Requirement: Gemini CLI Installation
-The installer MUST install Gemini CLI features using file copies and extension enablement.
-
-#### Scenario: Extension directory setup
-- **Given** a feature with `features/<feature>/gemini/extensions/<feature>/`
-- **When** installing for Gemini CLI
-- **Then** the installer copies extension files to `~/.gemini/extensions/<feature>/`
-
-#### Scenario: Extension manifest copy
-- **Given** a feature with `gemini-extension.json`
-- **When** installing for Gemini CLI
-- **Then** the installer copies the manifest to the extension directory
-
-#### Scenario: Extension enablement
-- **Given** a feature being installed for Gemini CLI
+#### Scenario: Codex selected
+- **Given** the user selected Codex CLI
 - **When** installation completes
-- **Then** the installer updates `~/.gemini/extensions/extension-enablement.json` to include `"<feature>": true`
+- **Then** the Done screen shows: "Codex CLI: Restart to discover new skills"
 
-#### Scenario: Config installation
-- **Given** a feature with `features/<feature>/gemini/GEMINI.md`
-- **When** installing for Gemini CLI
-- **Then** the installer merges content into `~/.gemini/GEMINI.md` managed block
-
-### Requirement: Codex CLI Installation
-The installer MUST install Codex CLI features using file copies.
-
-#### Scenario: Prompt file copy
-- **Given** a feature with prompt files in `features/<feature>/codex/prompts/`
-- **When** installing for Codex CLI
-- **Then** the installer copies files from source to `~/.codex/prompts/`
-
-#### Scenario: Config installation
-- **Given** a feature with `features/<feature>/codex/AGENTS.md`
-- **When** installing for Codex CLI
-- **Then** the installer merges content into `~/.codex/AGENTS.md` managed block
-
-#### Scenario: Existing symlink replacement
-- **Given** a symlink exists at the destination from a previous installation
-- **When** re-running the installer
-- **Then** the installer removes the symlink and creates a file copy
+#### Scenario: Gemini selected
+- **Given** the user selected Gemini CLI
+- **When** installation completes
+- **Then** the Done screen shows: "Gemini CLI: Skills auto-discovered on next invocation"
 
 ### Requirement: Feature Registration
 Features MUST be registered in the installer's FEATURES list to be available for selection.
@@ -206,15 +218,10 @@ The installer MUST guide users through a multi-screen wizard flow.
 ### Requirement: Installation Idempotency
 Re-running the installer MUST be safe and produce consistent results.
 
-#### Scenario: File already exists
-- **Given** a file already exists at the destination
+#### Scenario: Skill already installed
+- **Given** a skill directory already exists at the destination
 - **When** re-running installation
-- **Then** the installer overwrites the file with current content
-
-#### Scenario: Symlink exists from previous version
-- **Given** a symlink exists at the destination from a prior installation
-- **When** re-running installation
-- **Then** the installer removes the symlink and creates a file copy
+- **Then** the installer removes and replaces the directory with current content
 
 #### Scenario: Config already merged
 - **Given** a feature's config is already in the managed block
@@ -225,4 +232,3 @@ Re-running the installer MUST be safe and produce consistent results.
 - **Given** destination directories already exist
 - **When** running installation
 - **Then** the installer proceeds without error
-
